@@ -32,15 +32,15 @@ export function BottomNav() {
 
   return (
     <>
-      {/* overlay para fechar ao clicar fora */}
+      {/* overlay — só mobile */}
       {moreOpen && (
         <div
-          className="fixed inset-0 z-[70]"
+          className="lg:hidden fixed inset-0 z-[70]"
           onClick={() => setMoreOpen(false)}
         />
       )}
 
-      {/* popup do "Mais" */}
+      {/* popup do "Mais" — só mobile */}
       {moreOpen && (
         <div
           className="fixed bottom-[calc(56px+env(safe-area-inset-bottom))] right-2 z-[75] bg-white border border-border rounded-xl shadow-lg overflow-hidden"
@@ -65,9 +65,9 @@ export function BottomNav() {
         </div>
       )}
 
-      {/* barra principal */}
+      {/* barra principal — oculta no desktop */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-border"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-border"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="flex items-center">
