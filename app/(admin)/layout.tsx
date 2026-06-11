@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { BottomNav } from '@/components/layout/BottomNav'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -9,13 +9,26 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user) redirect('/login')
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-6 py-8">
-          {children}
+    <>
+      <header
+        className="sticky top-0 z-50 bg-white border-b border-border"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+      >
+        <div className="px-4 h-12 flex items-center">
+          <span className="text-base font-bold text-brand-red tracking-tight">
+            Momentier Atelier
+          </span>
         </div>
+      </header>
+
+      <main
+        className="px-4 py-4 max-w-2xl mx-auto"
+        style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}
+      >
+        {children}
       </main>
-    </div>
+
+      <BottomNav />
+    </>
   )
 }
