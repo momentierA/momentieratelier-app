@@ -78,6 +78,9 @@ npm run dev
 ## Para subir nova versão
 
 1. Fazer as alterações
-2. Atualizar versão em `MAPA_DO_PROJETO.md`
-3. `git add . && git commit -m "descrição do que mudou"`
-4. `git push` → Vercel faz o deploy automaticamente
+2. **Atualizar `lib/version.ts`** — bumpar `APP_VERSION` (ex: `v1.1.0` → `v1.2.0`)
+3. Atualizar versão em `MAPA_DO_PROJETO.md`
+4. `git add . && git commit -m "descrição do que mudou"`
+5. `git push` → Vercel faz o deploy automaticamente
+
+> **Regra:** toda mudança que vai pro ar = nova versão. A versão aparece no header do app.
