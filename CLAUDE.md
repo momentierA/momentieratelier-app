@@ -1,4 +1,4 @@
-# Cozy Anchor — Guia para Claude Code
+# Momentier Atelier — Guia para Claude Code
 
 ## O que é
 

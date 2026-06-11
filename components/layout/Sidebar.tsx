@@ -31,7 +31,7 @@ export function Sidebar() {
   return (
     <aside className="w-60 shrink-0 bg-white border-r border-border flex flex-col min-h-screen">
       <div className="px-6 py-5 border-b border-border">
-        <span className="text-xl font-bold text-brand-red tracking-tight">⚓ Cozy Anchor</span>
+        <span className="text-xl font-bold text-brand-red tracking-tight">Momentier Atelier</span>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">

@@ -6,8 +6,8 @@ import { Providers } from "@/components/providers";
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Cozy Anchor",
-  description: "Sistema de gestão",
+  title: "Momentier Atelier",
+  description: "Momentier Atelier — Sistema de gestão",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

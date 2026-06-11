@@ -1,4 +1,4 @@
-# MAPA DO PROJETO — Cozy Anchor v1.0.0
+# MAPA DO PROJETO — Momentier Atelier v1.0.0
 
 > Cole este arquivo no início de cada chat novo para ir direto no arquivo certo.
 

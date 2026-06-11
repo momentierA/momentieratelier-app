@@ -37,7 +37,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-brand-cream px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-brand-red">⚓ Cozy Anchor</h1>
+          <h1 className="text-3xl font-bold text-brand-red">Momentier Atelier</h1>
           <p className="text-muted-foreground mt-2 text-sm">Sistema de gestão</p>
         </div>
 
