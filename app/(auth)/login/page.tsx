@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -36,9 +37,16 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-brand-cream px-4">
       <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-brand-red">Momentier Atelier</h1>
-          <p className="text-muted-foreground mt-2 text-sm">Sistema de gestão</p>
+        <div className="flex flex-col items-center gap-2">
+          <Image
+            src="/icons/icon-180.png"
+            alt="Momentier Atelier"
+            width={120}
+            height={120}
+            className="rounded-full"
+            priority
+          />
+          <p className="text-muted-foreground text-sm">Sistema de gestão</p>
         </div>
 
         <Card className="shadow-sm">

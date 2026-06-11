@@ -13,6 +13,9 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "Momentier Atelier",
   },
+  icons: {
+    apple: "/icons/icon-180.png",
+  },
 };
 
 export const viewport: Viewport = {
