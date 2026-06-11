@@ -52,6 +52,7 @@ export function BottomNav() {
               <Link
                 key={href}
                 href={href}
+                prefetch={true}
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors',
                   active ? 'text-brand-red bg-brand-cream' : 'text-brand-brown hover:bg-brand-cream'
@@ -77,6 +78,7 @@ export function BottomNav() {
               <Link
                 key={href}
                 href={href}
+                prefetch={true}
                 className={cn(
                   'flex flex-col items-center gap-0.5 py-2.5 flex-1 transition-colors',
                   active ? 'text-brand-red' : 'text-brand-brown'
