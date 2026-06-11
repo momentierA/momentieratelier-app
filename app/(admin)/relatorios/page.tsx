@@ -64,7 +64,7 @@ export default async function RelatoriosPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Relatórios</h1>
+      <h1 className="text-xl font-bold">Relatórios</h1>
 
       <Tabs defaultValue="produtos">
         <TabsList className="bg-secondary">

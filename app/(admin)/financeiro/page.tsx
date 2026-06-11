@@ -38,10 +38,10 @@ export default async function FinanceiroPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Financeiro</h1>
-        <Link href="/financeiro/nova" className={cn(buttonVariants(), 'bg-brand-red hover:bg-brand-red-dark text-white')}>
-          <Plus size={16} className="mr-2" />Nova despesa
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-bold">Financeiro</h1>
+        <Link href="/financeiro/nova" className={cn(buttonVariants({ size: 'sm' }), 'bg-brand-red hover:bg-brand-red-dark text-white shrink-0')}>
+          <Plus size={14} className="mr-1" />Nova despesa
         </Link>
       </div>
 

@@ -15,10 +15,10 @@ export default async function ProdutosPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Produtos</h1>
-        <Link href="/produtos/novo" className={cn(buttonVariants(), 'bg-brand-red hover:bg-brand-red-dark text-white')}>
-          <Plus size={16} className="mr-2" />Novo produto
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-bold">Produtos</h1>
+        <Link href="/produtos/novo" className={cn(buttonVariants({ size: 'sm' }), 'bg-brand-red hover:bg-brand-red-dark text-white shrink-0')}>
+          <Plus size={14} className="mr-1" />Novo
         </Link>
       </div>
 
