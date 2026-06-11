@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: "Momentier Atelier",
   },
   icons: {
-    apple: "/icons/icon-180.png",
+    apple: "/icons/icon-apple.png",
   },
 };
 
