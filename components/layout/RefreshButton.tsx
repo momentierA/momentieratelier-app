@@ -15,7 +15,7 @@ export function RefreshButton() {
   return (
     <button
       onClick={handleRefresh}
-      className="p-1.5 rounded-md text-brand-brown/60 hover:text-brand-red hover:bg-brand-cream transition-colors"
+      className="p-1.5 rounded-md text-brand-brown/60 hover:text-brand-red transition-colors"
       aria-label="Atualizar app"
     >
       <RefreshCw size={16} className={cn(spinning && 'animate-spin')} />

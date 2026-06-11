@@ -1,48 +1,109 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Package, ShoppingCart, PackageOpen,
-  DollarSign, BarChart2
+  LayoutDashboard, Package, DollarSign, MoreHorizontal,
+  ShoppingCart, PackageOpen, BarChart2, X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const nav = [
+const mainNav = [
   { href: '/', icon: LayoutDashboard, label: 'Início' },
   { href: '/produtos', icon: Package, label: 'Produtos' },
+  { href: '/financeiro', icon: DollarSign, label: 'Finanças' },
+]
+
+const moreNav = [
   { href: '/vendas', icon: ShoppingCart, label: 'Vendas' },
   { href: '/entradas', icon: PackageOpen, label: 'Entradas' },
-  { href: '/financeiro', icon: DollarSign, label: 'Finanças' },
-  { href: '/relatorios', icon: BarChart2, label: 'Rel.' },
+  { href: '/relatorios', icon: BarChart2, label: 'Relatórios' },
 ]
 
 export function BottomNav() {
   const pathname = usePathname()
+  const [moreOpen, setMoreOpen] = useState(false)
+
+  const moreActive = moreNav.some(({ href }) => pathname.startsWith(href))
+
+  // fecha ao navegar
+  useEffect(() => { setMoreOpen(false) }, [pathname])
 
   return (
-    <nav
-      className="fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-border"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-    >
-      <div className="flex items-center">
-        {nav.map(({ href, icon: Icon, label }) => {
-          const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={cn(
-                'flex flex-col items-center gap-0.5 py-2.5 flex-1 transition-colors',
-                active ? 'text-brand-red' : 'text-brand-brown'
-              )}
-            >
-              <Icon size={20} strokeWidth={active ? 2.5 : 1.5} />
-              <span className="text-[11px] font-medium leading-none">{label}</span>
-            </Link>
-          )
-        })}
-      </div>
-    </nav>
+    <>
+      {/* overlay para fechar ao clicar fora */}
+      {moreOpen && (
+        <div
+          className="fixed inset-0 z-[70]"
+          onClick={() => setMoreOpen(false)}
+        />
+      )}
+
+      {/* popup do "Mais" */}
+      {moreOpen && (
+        <div
+          className="fixed bottom-[calc(56px+env(safe-area-inset-bottom))] right-2 z-[75] bg-white border border-border rounded-xl shadow-lg overflow-hidden"
+          style={{ minWidth: 160 }}
+        >
+          {moreNav.map(({ href, icon: Icon, label }) => {
+            const active = pathname.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  'flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors',
+                  active ? 'text-brand-red bg-brand-cream' : 'text-brand-brown hover:bg-brand-cream'
+                )}
+              >
+                <Icon size={18} strokeWidth={active ? 2.5 : 1.5} />
+                {label}
+              </Link>
+            )
+          })}
+        </div>
+      )}
+
+      {/* barra principal */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-border"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
+        <div className="flex items-center">
+          {mainNav.map(({ href, icon: Icon, label }) => {
+            const active = href === '/' ? pathname === '/' : pathname.startsWith(href)
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  'flex flex-col items-center gap-0.5 py-2.5 flex-1 transition-colors',
+                  active ? 'text-brand-red' : 'text-brand-brown'
+                )}
+              >
+                <Icon size={20} strokeWidth={active ? 2.5 : 1.5} />
+                <span className="text-[11px] font-medium leading-none">{label}</span>
+              </Link>
+            )
+          })}
+
+          {/* botão Mais */}
+          <button
+            onClick={() => setMoreOpen(v => !v)}
+            className={cn(
+              'flex flex-col items-center gap-0.5 py-2.5 flex-1 transition-colors',
+              (moreActive || moreOpen) ? 'text-brand-red' : 'text-brand-brown'
+            )}
+          >
+            {moreOpen
+              ? <X size={20} strokeWidth={2} />
+              : <MoreHorizontal size={20} strokeWidth={(moreActive || moreOpen) ? 2.5 : 1.5} />
+            }
+            <span className="text-[11px] font-medium leading-none">Mais</span>
+          </button>
+        </div>
+      </nav>
+    </>
   )
 }
