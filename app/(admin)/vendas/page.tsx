@@ -29,7 +29,40 @@ export default async function VendasPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border overflow-hidden">
-        <div className="overflow-x-auto">
+
+        {/* Mobile: cards */}
+        <div className="lg:hidden divide-y divide-border">
+          {sales.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma venda registrada.</p>
+          )}
+          {sales.map((s) => {
+            const total = s.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
+            return (
+              <div key={s.id} className="px-4 py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(s.sale_date + 'T12:00:00').toLocaleDateString('pt-BR')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">{paymentLabel[s.payment_method] ?? s.payment_method}</span>
+                    <span className="font-bold text-sm">{usd(total)}</span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {s.sale_items.map((i) => (
+                    <Badge key={i.id} variant="secondary" className="text-xs">
+                      {i.products.name} ×{i.quantity}
+                    </Badge>
+                  ))}
+                </div>
+                {s.notes && <p className="text-xs text-muted-foreground truncate">{s.notes}</p>}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Desktop: tabela */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
@@ -75,6 +108,7 @@ export default async function VendasPage() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   )

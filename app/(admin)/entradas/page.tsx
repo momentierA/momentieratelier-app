@@ -22,7 +22,42 @@ export default async function EntradasPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border overflow-hidden">
-        <div className="overflow-x-auto">
+
+        {/* Mobile: cards */}
+        <div className="lg:hidden divide-y divide-border">
+          {purchases.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma entrada registrada.</p>
+          )}
+          {purchases.map((p) => {
+            const total = p.purchase_items.reduce((acc, i) => acc + i.quantity * i.unit_cost, 0)
+            return (
+              <div key={p.id} className="px-4 py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(p.purchase_date + 'T12:00:00').toLocaleDateString('pt-BR')}
+                    </span>
+                    {p.supplier && (
+                      <span className="text-xs text-muted-foreground"> · {p.supplier}</span>
+                    )}
+                  </div>
+                  <span className="font-bold text-sm">{usd(total)}</span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {p.purchase_items.map((i) => (
+                    <Badge key={i.id} variant="secondary" className="text-xs">
+                      {i.products.name} ×{i.quantity}
+                    </Badge>
+                  ))}
+                </div>
+                {p.notes && <p className="text-xs text-muted-foreground truncate">{p.notes}</p>}
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Desktop: tabela */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
@@ -68,6 +103,7 @@ export default async function EntradasPage() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   )

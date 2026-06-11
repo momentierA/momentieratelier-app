@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { getProducts } from '@/actions/products'
 import { Badge } from '@/components/ui/badge'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { ToggleActiveButton } from './ToggleActiveButton'
-import { Plus } from 'lucide-react'
+import { Plus, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 function usd(v: number) {
@@ -23,7 +23,50 @@ export default async function ProdutosPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border overflow-hidden">
-        <div className="overflow-x-auto">
+
+        {/* Mobile: cards */}
+        <div className="lg:hidden divide-y divide-border">
+          {products.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum produto cadastrado.</p>
+          )}
+          {products.map((p) => {
+            const margin = p.sale_price > 0
+              ? ((p.sale_price - p.cost_price) / p.sale_price * 100).toFixed(1)
+              : '0.0'
+            const lowStock = p.stock_quantity <= p.low_stock_threshold
+            return (
+              <div key={p.id} className="px-4 py-3 flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-sm truncate">{p.name}</p>
+                    <Badge variant={p.active ? 'default' : 'secondary'} className={cn('text-[10px] shrink-0', p.active ? 'bg-brand-red' : '')}>
+                      {p.active ? 'Ativo' : 'Inativo'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-mono mt-0.5">{p.sku}</p>
+                  <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                    <span className={lowStock ? 'text-destructive font-semibold' : ''}>
+                      {lowStock && '⚠ '}Estoque: {p.stock_quantity}
+                    </span>
+                    <span className="text-brand-brown font-medium">{margin}% margem</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <p className="font-bold text-sm">{usd(p.sale_price)}</p>
+                  <div className="flex items-center gap-1.5">
+                    <Link href={`/produtos/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 px-2')}>
+                      <Pencil size={12} />
+                    </Link>
+                    <ToggleActiveButton id={p.id} active={p.active} />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Desktop: tabela */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
@@ -55,9 +98,7 @@ export default async function ProdutosPage() {
                     <td className="px-4 py-3 font-medium">{p.name}</td>
                     <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{p.sku}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className={lowStock ? 'text-destructive font-semibold' : ''}>
-                        {p.stock_quantity}
-                      </span>
+                      <span className={lowStock ? 'text-destructive font-semibold' : ''}>{p.stock_quantity}</span>
                       {lowStock && <span className="text-destructive ml-1 text-xs">⚠</span>}
                     </td>
                     <td className="px-4 py-3 text-right text-muted-foreground">{usd(p.cost_price)}</td>
@@ -82,6 +123,7 @@ export default async function ProdutosPage() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   )

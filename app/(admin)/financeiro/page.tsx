@@ -60,7 +60,39 @@ export default async function FinanceiroPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border overflow-hidden">
-        <div className="overflow-x-auto">
+
+        {/* Mobile: cards */}
+        <div className="lg:hidden divide-y divide-border">
+          {expenses.length === 0 && (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma despesa registrada.</p>
+          )}
+          {expenses.map((e) => (
+            <div key={e.id} className="px-4 py-3 flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm truncate">{e.description}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(e.expense_date + 'T12:00:00').toLocaleDateString('pt-BR')}
+                  </span>
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${categoryColor[e.category]}`}>
+                    {categoryLabel[e.category]}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="font-bold text-sm">{usd(e.amount)}</span>
+                {e.receipt_url && (
+                  <a href={e.receipt_url} target="_blank" rel="noreferrer" className="text-brand-red">
+                    <FileText size={14} />
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: tabela */}
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
@@ -103,6 +135,7 @@ export default async function FinanceiroPage() {
             </tbody>
           </table>
         </div>
+
       </div>
     </div>
   )
