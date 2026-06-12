@@ -56,7 +56,7 @@ export function SaleForm({ products }: Props) {
   const total = items.reduce((acc, i) => acc + (i.quantity || 0) * (i.unit_price || 0), 0)
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 max-w-2xl">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Data *</Label>

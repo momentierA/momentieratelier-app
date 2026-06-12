@@ -37,14 +37,14 @@ export function ExpenseForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 max-w-lg">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
         <Label>Descrição *</Label>
         <Input {...register('description')} placeholder="Ex: Taxa do marketplace, shipping..." />
         {errors.description && <p className="text-destructive text-xs">{errors.description.message}</p>}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label>Valor ($) *</Label>
           <Input type="number" step="0.01" min={0} {...register('amount', { valueAsNumber: true })} />
@@ -56,19 +56,19 @@ export function ExpenseForm() {
           <Input type="date" {...register('expense_date')} />
           {errors.expense_date && <p className="text-destructive text-xs">{errors.expense_date.message}</p>}
         </div>
-      </div>
 
-      <div className="space-y-2">
-        <Label>Categoria *</Label>
-        <Select defaultValue="outros" onValueChange={(v) => setValue('category', v as ExpenseFormValues['category'])}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="shipping">Shipping</SelectItem>
-            <SelectItem value="taxas">Taxas</SelectItem>
-            <SelectItem value="operacional">Operacional</SelectItem>
-            <SelectItem value="outros">Outros</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="col-span-2 lg:col-span-1 space-y-2">
+          <Label>Categoria *</Label>
+          <Select defaultValue="outros" onValueChange={(v) => setValue('category', v as ExpenseFormValues['category'])}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="shipping">Shipping</SelectItem>
+              <SelectItem value="taxas">Taxas</SelectItem>
+              <SelectItem value="operacional">Operacional</SelectItem>
+              <SelectItem value="outros">Outros</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-2">
