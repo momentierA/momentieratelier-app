@@ -24,6 +24,7 @@ export async function createExpense(values: ExpenseFormValues) {
     amount: parsed.data.amount,
     category: parsed.data.category,
     expense_date: parsed.data.expense_date,
+    supplier: parsed.data.supplier ?? null,
     receipt_url: parsed.data.receipt_url ?? null,
   })
   if (error) return { error: error.message }

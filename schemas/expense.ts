@@ -5,6 +5,7 @@ export const ExpenseSchema = z.object({
   amount: z.number().min(0.01, 'Valor deve ser maior que zero'),
   category: z.enum(['shipping', 'taxas', 'operacional', 'insumos', 'outros']),
   expense_date: z.string().min(1, 'Data obrigatória'),
+  supplier: z.string().nullable().optional(),
   receipt_url: z.string().nullable(),
 })
 

@@ -65,6 +65,7 @@ export type Expense = {
   amount: number
   category: ExpenseCategory
   expense_date: string
+  supplier: string | null
   receipt_url: string | null
   created_at: string
 }

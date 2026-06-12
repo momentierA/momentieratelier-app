@@ -24,6 +24,7 @@ export function ExpenseForm() {
       amount: 0,
       category: 'outros',
       expense_date: today,
+      supplier: null,
       receipt_url: null,
     },
   })
@@ -70,6 +71,11 @@ export function ExpenseForm() {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Fornecedor</Label>
+        <Input {...register('supplier')} placeholder="Ex: Amazon, Shein, Hobby Lobby..." />
       </div>
 
       <div className="space-y-2">

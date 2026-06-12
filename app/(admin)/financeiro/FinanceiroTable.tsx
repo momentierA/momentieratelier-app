@@ -45,7 +45,10 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
 
     if (query.trim()) {
       const q = query.toLowerCase()
-      r = r.filter(e => e.description.toLowerCase().includes(q))
+      r = r.filter(e =>
+        e.description.toLowerCase().includes(q) ||
+        (e.supplier ?? '').toLowerCase().includes(q)
+      )
     }
     if (categoryFilter !== 'all') r = r.filter(e => e.category === categoryFilter)
 
@@ -72,7 +75,7 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
         <div className="relative flex-1 min-w-[180px]">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Buscar por descrição..."
+            placeholder="Buscar por descrição ou fornecedor..."
             className="pl-8 h-8 text-sm"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -101,8 +104,9 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
           <div key={e.id} className="px-4 py-3 flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-sm truncate">{e.description}</p>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <span className="text-xs text-muted-foreground">{fmtDate(e.expense_date)}</span>
+                {e.supplier && <span className="text-xs text-muted-foreground">{e.supplier}</span>}
                 <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${categoryColor[e.category]}`}>
                   {categoryLabel[e.category]}
                 </span>
@@ -132,6 +136,7 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
                 <span className="flex items-center gap-1">Data <SortIcon active={sortField === 'date'} dir={sortDir} /></span>
               </th>
               <th className="px-4 py-3 text-left">Descrição</th>
+              <th className="px-4 py-3 text-left w-36 whitespace-nowrap">Fornecedor</th>
               <th className="px-4 py-3 text-left w-32 whitespace-nowrap">Categoria</th>
               <th
                 className="px-4 py-3 text-right w-28 whitespace-nowrap cursor-pointer select-none"
@@ -144,12 +149,13 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">Nenhuma despesa encontrada.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Nenhuma despesa encontrada.</td></tr>
             )}
             {filtered.map((e) => (
               <tr key={e.id} className="hover:bg-secondary/30 transition-colors">
                 <td className="px-4 py-3 whitespace-nowrap">{fmtDate(e.expense_date)}</td>
                 <td className="px-4 py-3 font-medium">{e.description}</td>
+                <td className="px-4 py-3 text-muted-foreground text-sm">{e.supplier ?? '—'}</td>
                 <td className="px-4 py-3">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${categoryColor[e.category]}`}>
                     {categoryLabel[e.category]}
@@ -168,7 +174,7 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
           {filtered.length > 0 && (
             <tfoot>
               <tr className="border-t border-border bg-secondary/50">
-                <td colSpan={3} className="px-4 py-2 text-xs text-muted-foreground">Total filtrado</td>
+                <td colSpan={4} className="px-4 py-2 text-xs text-muted-foreground">Total filtrado</td>
                 <td className="px-4 py-2 text-right font-bold text-brand-red">{usd(filteredTotal)}</td>
                 <td />
               </tr>
