@@ -9,6 +9,9 @@ export const ProductSchema = z.object({
   sale_price: z.number().min(0, 'Preço de venda inválido'),
   low_stock_threshold: z.number().int().min(0),
   active: z.boolean(),
+  category: z.string().nullable().optional(),
+  supplier: z.string().nullable().optional(),
+  supplier_link: z.string().nullable().optional(),
 })
 
 export type ProductFormValues = z.infer<typeof ProductSchema>

@@ -12,6 +12,9 @@ export type Product = {
   low_stock_threshold: number
   active: boolean
   created_at: string
+  category?: string | null
+  supplier?: string | null
+  supplier_link?: string | null
 }
 
 export type Purchase = {

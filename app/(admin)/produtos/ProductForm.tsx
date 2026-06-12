@@ -38,6 +38,9 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
       sale_price: defaultValues?.sale_price ?? 0,
       low_stock_threshold: defaultValues?.low_stock_threshold ?? 5,
       active: defaultValues?.active ?? true,
+      category: defaultValues?.category ?? null,
+      supplier: defaultValues?.supplier ?? null,
+      supplier_link: defaultValues?.supplier_link ?? null,
     },
   })
 
@@ -94,6 +97,21 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
           <Label>Alerta de estoque baixo</Label>
           <Input type="number" min={0} {...register('low_stock_threshold', { valueAsNumber: true })} />
           <p className="text-xs text-muted-foreground">Avisa quando estoque atingir este valor</p>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Categoria</Label>
+          <Input {...register('category')} placeholder="Ex: Vela, Fita, Chocolate..." />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Fornecedor</Label>
+          <Input {...register('supplier')} placeholder="Ex: Bath & Body Works, Shein..." />
+        </div>
+
+        <div className="col-span-2 space-y-2">
+          <Label>Link do fornecedor</Label>
+          <Input {...register('supplier_link')} placeholder="URL ou código do produto no fornecedor" />
         </div>
       </div>
 

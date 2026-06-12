@@ -37,11 +37,16 @@ export default async function ProdutosPage() {
             return (
               <div key={p.id} className="px-4 py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold text-sm truncate">{p.name}</p>
                     <Badge variant={p.active ? 'default' : 'secondary'} className={cn('text-[10px] shrink-0', p.active ? 'bg-brand-red' : '')}>
                       {p.active ? 'Ativo' : 'Inativo'}
                     </Badge>
+                    {p.category && (
+                      <Badge variant="outline" className="text-[10px] shrink-0 text-brand-brown border-brand-brown/30">
+                        {p.category}
+                      </Badge>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground font-mono mt-0.5">{p.sku}</p>
                   <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
@@ -72,6 +77,8 @@ export default async function ProdutosPage() {
               <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
                 <th className="px-4 py-3 text-left">Produto</th>
                 <th className="px-4 py-3 text-left">SKU</th>
+                <th className="px-4 py-3 text-left">Categoria</th>
+                <th className="px-4 py-3 text-left">Fornecedor</th>
                 <th className="px-4 py-3 text-right">Estoque</th>
                 <th className="px-4 py-3 text-right">Custo</th>
                 <th className="px-4 py-3 text-right">Venda</th>
@@ -83,7 +90,7 @@ export default async function ProdutosPage() {
             <tbody className="divide-y divide-border">
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">
                     Nenhum produto cadastrado.
                   </td>
                 </tr>
@@ -97,6 +104,8 @@ export default async function ProdutosPage() {
                   <tr key={p.id} className="hover:bg-secondary/30 transition-colors">
                     <td className="px-4 py-3 font-medium">{p.name}</td>
                     <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{p.sku}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{p.category ?? '—'}</td>
+                    <td className="px-4 py-3 text-muted-foreground text-xs">{p.supplier ?? '—'}</td>
                     <td className="px-4 py-3 text-right">
                       <span className={lowStock ? 'text-destructive font-semibold' : ''}>{p.stock_quantity}</span>
                       {lowStock && <span className="text-destructive ml-1 text-xs">⚠</span>}
