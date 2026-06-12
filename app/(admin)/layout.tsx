@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </header>
 
         <main
-          className="px-4 py-4 max-w-2xl mx-auto lg:mx-0 lg:max-w-6xl"
+          className="px-4 py-4 max-w-2xl mx-auto lg:mx-0 lg:max-w-none"
           style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}
         >
           {children}
