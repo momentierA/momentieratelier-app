@@ -45,6 +45,28 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
   })
 
   const imageUrl = watch('image_url')
+  const costPrice = watch('cost_price') || 0
+  const salePrice = watch('sale_price') || 0
+
+  const MARKUP_MIN = 3
+  const MARKUP_MAX = 4.5
+  const SALES_TAX_RATE = 0.08
+  const INCOME_TAX_RATE = 0.30
+
+  const suggestedMin = costPrice * MARKUP_MIN
+  const suggestedMax = costPrice * MARKUP_MAX
+  const salesTax = salePrice * SALES_TAX_RATE
+  const grossProfit = salePrice - costPrice
+  const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
+  const netProfit = grossProfit - incomeTax
+
+  const priceStatus = costPrice > 0 && salePrice > 0
+    ? salePrice < suggestedMin ? 'below' : salePrice > suggestedMax ? 'above' : 'within'
+    : null
+
+  function usd(v: number) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
+  }
 
   function onSubmit(values: ProductFormValues) {
     startTransition(async () => {
@@ -110,6 +132,54 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
           <Input {...register('category')} placeholder="Ex: Vela, Fita, Chocolate..." />
         </div>
       </div>
+
+      {/* Calculadora de Preço */}
+      {costPrice > 0 && (
+        <div className="rounded-lg border border-border bg-secondary/40 p-4 space-y-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Calculadora de Preço</p>
+
+          {/* Faixa sugerida */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Faixa sugerida (3× – 4.5×)</span>
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-sm">{usd(suggestedMin)} – {usd(suggestedMax)}</span>
+              {priceStatus === 'below' && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium">Abaixo da faixa</span>}
+              {priceStatus === 'within' && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">Na faixa ✓</span>}
+              {priceStatus === 'above' && <span className="text-[11px] px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium">Acima da faixa</span>}
+            </div>
+          </div>
+
+          {/* Breakdown só quando preço de venda está preenchido */}
+          {salePrice > 0 && (
+            <div className="border-t border-border pt-3 space-y-2">
+              <p className="text-xs text-muted-foreground">Com venda a {usd(salePrice)}:</p>
+
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Lucro bruto</span>
+                <span>{usd(grossProfit)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Sales tax (8% do preço de venda)</span>
+                <span className="font-medium text-amber-700">– {usd(salesTax)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Income tax (30% do lucro bruto)</span>
+                <span className="font-medium text-amber-700">– {usd(incomeTax)}</span>
+              </div>
+
+              <div className="flex justify-between text-sm font-semibold border-t border-border pt-2 mt-1">
+                <span>Lucro líquido</span>
+                <span className={netProfit >= 0 ? 'text-emerald-700' : 'text-destructive'}>{usd(netProfit)}</span>
+              </div>
+
+              <p className="text-[11px] text-muted-foreground pt-1">
+                Separar: <span className="font-medium text-amber-700">{usd(salesTax + incomeTax)}</span>
+                {' '}({usd(salesTax)} sales tax + {usd(incomeTax)} income tax)
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Linha 3: Fornecedor · Link */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
