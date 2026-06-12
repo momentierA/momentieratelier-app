@@ -28,15 +28,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </span>
             {/* spacer no desktop para manter o refresh alinhado à direita */}
             <span className="hidden lg:block" />
-            <div className="flex items-center gap-1">
-              <span className="text-[10px] text-brand-brown/50 font-mono font-bold">{APP_VERSION}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-brand-brown/70 font-mono font-bold">{APP_VERSION}</span>
               <RefreshButton />
             </div>
           </div>
         </header>
 
         <main
-          className="px-4 py-4 max-w-2xl mx-auto lg:mx-0 lg:max-w-3xl"
+          className="px-4 py-4 max-w-2xl mx-auto lg:mx-0 lg:max-w-6xl"
           style={{ paddingBottom: 'calc(80px + env(safe-area-inset-bottom))' }}
         >
           {children}
