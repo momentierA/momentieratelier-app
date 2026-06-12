@@ -1,20 +1,9 @@
 import Link from 'next/link'
 import { getSales } from '@/actions/sales'
 import { buttonVariants } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-function usd(v: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
-}
-
-const paymentLabel: Record<string, string> = {
-  dinheiro: 'Dinheiro',
-  pix: 'PIX',
-  cartão: 'Cartão',
-  outro: 'Outro',
-}
+import { VendasTable } from './VendasTable'
 
 export default async function VendasPage() {
   const sales = await getSales()
@@ -28,88 +17,7 @@ export default async function VendasPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
-
-        {/* Mobile: cards */}
-        <div className="lg:hidden divide-y divide-border">
-          {sales.length === 0 && (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma venda registrada.</p>
-          )}
-          {sales.map((s) => {
-            const total = s.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
-            return (
-              <div key={s.id} className="px-4 py-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(s.sale_date + 'T12:00:00').toLocaleDateString('pt-BR')}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">{paymentLabel[s.payment_method] ?? s.payment_method}</span>
-                    <span className="font-bold text-sm">{usd(total)}</span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {s.sale_items.map((i) => (
-                    <Badge key={i.id} variant="secondary" className="text-xs">
-                      {i.products.name} ×{i.quantity}
-                    </Badge>
-                  ))}
-                </div>
-                {s.notes && <p className="text-xs text-muted-foreground truncate">{s.notes}</p>}
-              </div>
-            )
-          })}
-        </div>
-
-        {/* Desktop: tabela */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
-                <th className="px-4 py-3 text-left">Data</th>
-                <th className="px-4 py-3 text-left">Produtos</th>
-                <th className="px-4 py-3 text-right">Total</th>
-                <th className="px-4 py-3 text-left">Pagamento</th>
-                <th className="px-4 py-3 text-left">Notas</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {sales.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    Nenhuma venda registrada.
-                  </td>
-                </tr>
-              )}
-              {sales.map((s) => {
-                const total = s.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
-                return (
-                  <tr key={s.id} className="hover:bg-secondary/30">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {new Date(s.sale_date + 'T12:00:00').toLocaleDateString('pt-BR')}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {s.sale_items.map((i) => (
-                          <Badge key={i.id} variant="secondary" className="text-xs">
-                            {i.products.name} ×{i.quantity}
-                          </Badge>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-right font-semibold">{usd(total)}</td>
-                    <td className="px-4 py-3">{paymentLabel[s.payment_method] ?? s.payment_method}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate">
-                      {s.notes ?? '—'}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-
-      </div>
+      <VendasTable sales={sales} />
     </div>
   )
 }

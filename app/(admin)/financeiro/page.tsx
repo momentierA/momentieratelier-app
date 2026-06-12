@@ -1,26 +1,16 @@
 import Link from 'next/link'
 import { getExpenses } from '@/actions/expenses'
 import { buttonVariants } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Plus, FileText } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { FinanceiroTable } from './FinanceiroTable'
 
 function usd(v: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
 }
 
 const categoryLabel: Record<string, string> = {
-  shipping: 'Shipping',
-  taxas: 'Taxas',
-  operacional: 'Operacional',
-  outros: 'Outros',
-}
-
-const categoryColor: Record<string, string> = {
-  shipping: 'bg-blue-100 text-blue-800',
-  taxas: 'bg-amber-100 text-amber-800',
-  operacional: 'bg-purple-100 text-purple-800',
-  outros: 'bg-gray-100 text-gray-800',
+  shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', outros: 'Outros',
 }
 
 export default async function FinanceiroPage() {
@@ -28,8 +18,7 @@ export default async function FinanceiroPage() {
 
   const now = new Date()
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  const monthExpenses = expenses.filter(e => e.expense_date.startsWith(thisMonth))
-  const monthTotal = monthExpenses.reduce((acc, e) => acc + e.amount, 0)
+  const monthTotal = expenses.filter(e => e.expense_date.startsWith(thisMonth)).reduce((acc, e) => acc + e.amount, 0)
 
   const byCategory = expenses.reduce<Record<string, number>>((acc, e) => {
     acc[e.category] = (acc[e.category] ?? 0) + e.amount
@@ -59,84 +48,7 @@ export default async function FinanceiroPage() {
         <span className="font-semibold text-brand-red">{usd(monthTotal)}</span>
       </div>
 
-      <div className="bg-white rounded-xl border border-border overflow-hidden">
-
-        {/* Mobile: cards */}
-        <div className="lg:hidden divide-y divide-border">
-          {expenses.length === 0 && (
-            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhuma despesa registrada.</p>
-          )}
-          {expenses.map((e) => (
-            <div key={e.id} className="px-4 py-3 flex items-center justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-sm truncate">{e.description}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(e.expense_date + 'T12:00:00').toLocaleDateString('pt-BR')}
-                  </span>
-                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium ${categoryColor[e.category]}`}>
-                    {categoryLabel[e.category]}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="font-bold text-sm">{usd(e.amount)}</span>
-                {e.receipt_url && (
-                  <a href={e.receipt_url} target="_blank" rel="noreferrer" className="text-brand-red">
-                    <FileText size={14} />
-                  </a>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Desktop: tabela */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
-                <th className="px-4 py-3 text-left">Data</th>
-                <th className="px-4 py-3 text-left">Descrição</th>
-                <th className="px-4 py-3 text-left">Categoria</th>
-                <th className="px-4 py-3 text-right">Valor</th>
-                <th className="px-4 py-3 text-center">Recibo</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {expenses.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                    Nenhuma despesa registrada.
-                  </td>
-                </tr>
-              )}
-              {expenses.map((e) => (
-                <tr key={e.id} className="hover:bg-secondary/30">
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {new Date(e.expense_date + 'T12:00:00').toLocaleDateString('pt-BR')}
-                  </td>
-                  <td className="px-4 py-3 font-medium">{e.description}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${categoryColor[e.category]}`}>
-                      {categoryLabel[e.category]}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right font-semibold">{usd(e.amount)}</td>
-                  <td className="px-4 py-3 text-center">
-                    {e.receipt_url ? (
-                      <a href={e.receipt_url} target="_blank" rel="noreferrer" className="text-brand-red hover:underline inline-flex items-center gap-1">
-                        <FileText size={14} />
-                      </a>
-                    ) : '—'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-      </div>
+      <FinanceiroTable expenses={expenses} />
     </div>
   )
 }
