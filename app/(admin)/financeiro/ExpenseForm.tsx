@@ -62,6 +62,7 @@ export function ExpenseForm() {
           <Select defaultValue="outros" onValueChange={(v) => setValue('category', v as ExpenseFormValues['category'])}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
+              <SelectItem value="insumos">Insumos</SelectItem>
               <SelectItem value="shipping">Shipping</SelectItem>
               <SelectItem value="taxas">Taxas</SelectItem>
               <SelectItem value="operacional">Operacional</SelectItem>

@@ -1,4 +1,4 @@
-export type ExpenseCategory = 'shipping' | 'taxas' | 'operacional' | 'outros'
+export type ExpenseCategory = 'shipping' | 'taxas' | 'operacional' | 'insumos' | 'outros'
 export type PaymentMethod = 'dinheiro' | 'pix' | 'cartão' | 'outro'
 
 export type Product = {

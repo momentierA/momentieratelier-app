@@ -10,7 +10,7 @@ function usd(v: number) {
 }
 
 const categoryLabel: Record<string, string> = {
-  shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', outros: 'Outros',
+  insumos: 'Insumos', shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', outros: 'Outros',
 }
 
 export default async function FinanceiroPage() {
