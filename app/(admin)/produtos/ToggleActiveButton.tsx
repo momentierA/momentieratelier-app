@@ -13,7 +13,7 @@ export function ToggleActiveButton({ id, active }: { id: string; active: boolean
       size="sm"
       disabled={pending}
       onClick={() => startTransition(async () => { await toggleProductActive(id, !active) })}
-      className="text-muted-foreground"
+      className="h-7 text-xs px-2 text-muted-foreground w-full"
     >
       {active ? 'Inativar' : 'Ativar'}
     </Button>

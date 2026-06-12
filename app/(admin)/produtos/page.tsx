@@ -76,15 +76,15 @@ export default async function ProdutosPage() {
             <thead>
               <tr className="border-b border-border bg-secondary text-muted-foreground text-xs uppercase">
                 <th className="px-4 py-3 text-left">Produto</th>
-                <th className="px-4 py-3 text-left">SKU</th>
-                <th className="px-4 py-3 text-left">Categoria</th>
-                <th className="px-4 py-3 text-left">Fornecedor</th>
-                <th className="px-4 py-3 text-right">Estoque</th>
-                <th className="px-4 py-3 text-right">Custo</th>
-                <th className="px-4 py-3 text-right">Venda</th>
-                <th className="px-4 py-3 text-right">Lucro %</th>
-                <th className="px-4 py-3 text-center">Status</th>
-                <th className="px-4 py-3" />
+                <th className="px-2 py-3 text-left w-16">SKU</th>
+                <th className="px-3 py-3 text-left w-28">Categoria</th>
+                <th className="px-3 py-3 text-left w-32">Fornecedor</th>
+                <th className="px-3 py-3 text-right w-20 whitespace-nowrap">Estoque</th>
+                <th className="px-3 py-3 text-right w-24 whitespace-nowrap">Custo</th>
+                <th className="px-3 py-3 text-right w-24 whitespace-nowrap">Venda</th>
+                <th className="px-3 py-3 text-right w-20 whitespace-nowrap">Margem</th>
+                <th className="px-3 py-3 text-center w-20">Status</th>
+                <th className="px-3 py-3 w-16" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -103,24 +103,24 @@ export default async function ProdutosPage() {
                 return (
                   <tr key={p.id} className="hover:bg-secondary/30 transition-colors">
                     <td className="px-4 py-3 font-medium">{p.name}</td>
-                    <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{p.sku}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{p.category ?? '—'}</td>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{p.supplier ?? '—'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-2 py-3 text-muted-foreground font-mono text-xs">{p.sku}</td>
+                    <td className="px-3 py-3 text-muted-foreground text-xs">{p.category ?? '—'}</td>
+                    <td className="px-3 py-3 text-muted-foreground text-xs">{p.supplier ?? '—'}</td>
+                    <td className="px-3 py-3 text-right">
                       <span className={lowStock ? 'text-destructive font-semibold' : ''}>{p.stock_quantity}</span>
                       {lowStock && <span className="text-destructive ml-1 text-xs">⚠</span>}
                     </td>
-                    <td className="px-4 py-3 text-right text-muted-foreground">{usd(p.cost_price)}</td>
-                    <td className="px-4 py-3 text-right font-medium">{usd(p.sale_price)}</td>
-                    <td className="px-4 py-3 text-right text-brand-brown">{margin}%</td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="px-3 py-3 text-right text-muted-foreground">{usd(p.cost_price)}</td>
+                    <td className="px-3 py-3 text-right font-medium">{usd(p.sale_price)}</td>
+                    <td className="px-3 py-3 text-right text-brand-brown">{margin}%</td>
+                    <td className="px-3 py-3 text-center">
                       <Badge variant={p.active ? 'default' : 'secondary'} className={p.active ? 'bg-brand-red' : ''}>
                         {p.active ? 'Ativo' : 'Inativo'}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center gap-2 justify-end">
-                        <Link href={`/produtos/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}>
+                    <td className="px-3 py-3">
+                      <div className="flex flex-col gap-1 items-stretch">
+                        <Link href={`/produtos/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 text-xs px-2 justify-center')}>
                           Editar
                         </Link>
                         <ToggleActiveButton id={p.id} active={p.active} />
