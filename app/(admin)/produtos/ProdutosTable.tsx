@@ -15,7 +15,10 @@ function usd(v: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
 }
 
-type SortField = 'name' | 'stock' | 'sale_price' | 'margin'
+const SALES_TAX_RATE = 0.08
+const INCOME_TAX_RATE = 0.30
+
+type SortField = 'name' | 'stock' | 'sale_price' | 'margin' | 'net_profit'
 type SortDir = 'asc' | 'desc'
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
@@ -50,9 +53,12 @@ export function ProdutosTable({ products }: { products: Product[] }) {
       if (sortField === 'name') { va = a.name; vb = b.name }
       else if (sortField === 'stock') { va = a.stock_quantity; vb = b.stock_quantity }
       else if (sortField === 'sale_price') { va = a.sale_price; vb = b.sale_price }
-      else {
+      else if (sortField === 'margin') {
         va = a.sale_price > 0 ? (a.sale_price - a.cost_price) / a.sale_price : 0
         vb = b.sale_price > 0 ? (b.sale_price - b.cost_price) / b.sale_price : 0
+      } else {
+        va = Math.max(0, (a.sale_price - a.cost_price) * (1 - INCOME_TAX_RATE))
+        vb = Math.max(0, (b.sale_price - b.cost_price) * (1 - INCOME_TAX_RATE))
       }
       if (va < vb) return sortDir === 'asc' ? -1 : 1
       if (va > vb) return sortDir === 'asc' ? 1 : -1
@@ -116,6 +122,10 @@ export function ProdutosTable({ products }: { products: Product[] }) {
         {filtered.map((p) => {
           const margin = p.sale_price > 0 ? ((p.sale_price - p.cost_price) / p.sale_price * 100).toFixed(1) : '0.0'
           const lowStock = p.stock_quantity <= p.low_stock_threshold
+          const salesTax = p.sale_price * SALES_TAX_RATE
+          const grossProfit = p.sale_price - p.cost_price
+          const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
+          const netProfit = grossProfit - incomeTax
           return (
             <div key={p.id} className="px-4 py-3 flex items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
@@ -129,9 +139,11 @@ export function ProdutosTable({ products }: { products: Product[] }) {
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground font-mono mt-0.5">{p.sku}</p>
-                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground flex-wrap">
                   <span className={lowStock ? 'text-destructive font-semibold' : ''}>{lowStock && '⚠ '}Estoque: {p.stock_quantity}</span>
                   <span className="text-brand-brown font-medium">{margin}% margem</span>
+                  <span className="text-amber-600">Tax: {usd(salesTax + incomeTax)}</span>
+                  <span className="text-emerald-700 font-medium">Líq: {usd(netProfit)}</span>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2 shrink-0">
@@ -161,17 +173,24 @@ export function ProdutosTable({ products }: { products: Product[] }) {
               <th className="px-3 py-3 text-right w-24 text-muted-foreground text-xs uppercase whitespace-nowrap">Custo</th>
               <SortTh field="sale_price" label="Venda" className="px-3 text-right w-24 justify-end" />
               <SortTh field="margin" label="Margem" className="px-3 text-right w-20 justify-end" />
+              <th className="px-3 py-3 text-right w-24 text-muted-foreground text-xs uppercase whitespace-nowrap">Sales Tax</th>
+              <th className="px-3 py-3 text-right w-28 text-muted-foreground text-xs uppercase whitespace-nowrap">Income Tax</th>
+              <SortTh field="net_profit" label="Lucro Líq." className="px-3 text-right w-24 justify-end" />
               <th className="px-3 py-3 text-center w-20 text-muted-foreground text-xs uppercase whitespace-nowrap">Status</th>
               <th className="px-3 py-3 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 && (
-              <tr><td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">Nenhum produto encontrado.</td></tr>
+              <tr><td colSpan={13} className="px-4 py-8 text-center text-muted-foreground">Nenhum produto encontrado.</td></tr>
             )}
             {filtered.map((p) => {
               const margin = p.sale_price > 0 ? ((p.sale_price - p.cost_price) / p.sale_price * 100).toFixed(1) : '0.0'
               const lowStock = p.stock_quantity <= p.low_stock_threshold
+              const salesTax = p.sale_price * SALES_TAX_RATE
+              const grossProfit = p.sale_price - p.cost_price
+              const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
+              const netProfit = grossProfit - incomeTax
               return (
                 <tr key={p.id} className="hover:bg-secondary/30 transition-colors">
                   <td className="px-4 py-3 font-medium">{p.name}</td>
@@ -185,6 +204,9 @@ export function ProdutosTable({ products }: { products: Product[] }) {
                   <td className="px-3 py-3 text-right text-muted-foreground">{usd(p.cost_price)}</td>
                   <td className="px-3 py-3 text-right font-medium">{usd(p.sale_price)}</td>
                   <td className="px-3 py-3 text-right text-brand-brown">{margin}%</td>
+                  <td className="px-3 py-3 text-right text-amber-600 font-medium">{usd(salesTax)}</td>
+                  <td className="px-3 py-3 text-right text-amber-600 font-medium">{usd(incomeTax)}</td>
+                  <td className="px-3 py-3 text-right font-semibold text-emerald-700">{usd(netProfit)}</td>
                   <td className="px-3 py-3 text-center">
                     <Badge variant={p.active ? 'default' : 'secondary'} className={p.active ? 'bg-brand-red' : ''}>
                       {p.active ? 'Ativo' : 'Inativo'}
