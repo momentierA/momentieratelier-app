@@ -4,20 +4,21 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard, Package, DollarSign, MoreHorizontal,
-  ShoppingCart, PackageOpen, BarChart2, X
+  LayoutDashboard, Archive, DollarSign, MoreHorizontal,
+  ShoppingCart, PackageOpen, BarChart2, X, Package
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const mainNav = [
   { href: '/', icon: LayoutDashboard, label: 'Início' },
-  { href: '/produtos', icon: Package, label: 'Produtos' },
+  { href: '/estoque', icon: Archive, label: 'Estoque' },
   { href: '/financeiro', icon: DollarSign, label: 'Finanças' },
 ]
 
 const moreNav = [
   { href: '/vendas', icon: ShoppingCart, label: 'Vendas' },
-  { href: '/entradas', icon: PackageOpen, label: 'Entradas' },
+  { href: '/produtos', icon: Package, label: 'Produtos' },
+  { href: '/entradas', icon: PackageOpen, label: 'Prod. Momentier' },
   { href: '/relatorios', icon: BarChart2, label: 'Relatórios' },
 ]
 
@@ -44,10 +45,12 @@ export function BottomNav() {
       {moreOpen && (
         <div
           className="fixed bottom-[calc(56px+env(safe-area-inset-bottom))] right-2 z-[75] bg-white border border-border rounded-xl shadow-lg overflow-hidden"
-          style={{ minWidth: 160 }}
+          style={{ minWidth: 180 }}
         >
           {moreNav.map(({ href, icon: Icon, label }) => {
-            const active = pathname.startsWith(href)
+            const active = href === '/produtos'
+              ? pathname.startsWith('/produtos')
+              : pathname.startsWith(href)
             return (
               <Link
                 key={href}

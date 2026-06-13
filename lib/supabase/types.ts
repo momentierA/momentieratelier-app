@@ -15,6 +15,7 @@ export type Product = {
   category?: string | null
   supplier?: string | null
   supplier_link?: string | null
+  kit_quantity?: number | null
 }
 
 export type Purchase = {
@@ -70,6 +71,21 @@ export type Expense = {
   created_at: string
 }
 
+export type ProductLineItem = {
+  id: string
+  name: string
+  description: string | null
+  cost_price: number
+  sale_price: number
+  stock_quantity: number
+  low_stock_threshold: number
+  image_url: string | null
+  active: boolean
+  created_at: string
+}
+
+export type ProductLine = 'papelaria' | 'personalizados' | 'cestas' | 'bbw'
+
 export type Database = {
   public: {
     Tables: {
@@ -107,6 +123,30 @@ export type Database = {
         Row: Expense
         Insert: Omit<Expense, 'id' | 'created_at'>
         Update: Partial<Omit<Expense, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      papelaria_products: {
+        Row: ProductLineItem
+        Insert: Omit<ProductLineItem, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      personalizados_products: {
+        Row: ProductLineItem
+        Insert: Omit<ProductLineItem, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      cestas_products: {
+        Row: ProductLineItem
+        Insert: Omit<ProductLineItem, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      bbw_products: {
+        Row: ProductLineItem
+        Insert: Omit<ProductLineItem, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
         Relationships: []
       }
     }

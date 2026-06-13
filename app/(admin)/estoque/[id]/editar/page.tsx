@@ -15,7 +15,7 @@ export default async function EditarProdutoPage({ params }: { params: Promise<{ 
           <Pencil size={22} />
         </div>
         <div>
-          <p className="text-xs text-white/60 uppercase tracking-wider">Produtos</p>
+          <p className="text-xs text-white/60 uppercase tracking-wider">Estoque</p>
           <h1 className="text-xl font-bold">Editar produto</h1>
           <p className="text-sm text-white/70 mt-0.5 truncate">{product.name}</p>
         </div>

@@ -9,7 +9,7 @@ export default function NovoProdutoPage() {
           <Package size={22} />
         </div>
         <div>
-          <p className="text-xs text-white/60 uppercase tracking-wider">Produtos</p>
+          <p className="text-xs text-white/60 uppercase tracking-wider">Estoque</p>
           <h1 className="text-xl font-bold">Novo produto</h1>
         </div>
       </div>

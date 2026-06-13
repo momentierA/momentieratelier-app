@@ -44,7 +44,7 @@ export async function createProduct(values: ProductFormValues) {
   const { error } = await supabase.from('products').insert(parsed.data)
   if (error) return { error: error.message }
 
-  revalidatePath('/produtos')
+  revalidatePath('/estoque')
   return { success: true }
 }
 
@@ -56,7 +56,7 @@ export async function updateProduct(id: string, values: ProductFormValues) {
   const { error } = await supabase.from('products').update(parsed.data).eq('id', id)
   if (error) return { error: error.message }
 
-  revalidatePath('/produtos')
+  revalidatePath('/estoque')
   return { success: true }
 }
 
@@ -64,6 +64,6 @@ export async function toggleProductActive(id: string, active: boolean) {
   const supabase = await createClient()
   const { error } = await supabase.from('products').update({ active }).eq('id', id)
   if (error) return { error: error.message }
-  revalidatePath('/produtos')
+  revalidatePath('/estoque')
   return { success: true }
 }

@@ -149,7 +149,7 @@ export function ProdutosTable({ products }: { products: Product[] }) {
               <div className="flex flex-col items-end gap-2 shrink-0">
                 <p className="font-bold text-sm">{usd(p.sale_price)}</p>
                 <div className="flex items-center gap-1.5">
-                  <Link href={`/produtos/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 px-2')}>
+                  <Link href={`/estoque/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 px-2')}>
                     <Pencil size={12} />
                   </Link>
                   <ToggleActiveButton id={p.id} active={p.active} />
@@ -171,6 +171,7 @@ export function ProdutosTable({ products }: { products: Product[] }) {
               <th className="px-3 py-3 text-left w-32 text-muted-foreground text-xs uppercase whitespace-nowrap">Fornecedor</th>
               <SortTh field="stock" label="Estoque" className="px-3 text-right w-20 justify-end" />
               <th className="px-3 py-3 text-right w-24 text-muted-foreground text-xs uppercase whitespace-nowrap">Custo</th>
+              <th className="px-3 py-3 text-right w-24 text-muted-foreground text-xs uppercase whitespace-nowrap">Valor unit.</th>
               <SortTh field="sale_price" label="Venda" className="px-3 text-right w-24 justify-end" />
               <SortTh field="margin" label="Margem" className="px-3 text-right w-20 justify-end" />
               <th className="px-3 py-3 text-right w-24 text-muted-foreground text-xs uppercase whitespace-nowrap">Sales Tax</th>
@@ -182,7 +183,7 @@ export function ProdutosTable({ products }: { products: Product[] }) {
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 && (
-              <tr><td colSpan={13} className="px-4 py-8 text-center text-muted-foreground">Nenhum produto encontrado.</td></tr>
+              <tr><td colSpan={14} className="px-4 py-8 text-center text-muted-foreground">Nenhum produto encontrado.</td></tr>
             )}
             {filtered.map((p) => {
               const margin = p.sale_price > 0 ? ((p.sale_price - p.cost_price) / p.sale_price * 100).toFixed(1) : '0.0'
@@ -191,6 +192,8 @@ export function ProdutosTable({ products }: { products: Product[] }) {
               const grossProfit = p.sale_price - p.cost_price
               const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
               const netProfit = grossProfit - incomeTax
+              const kitQty = p.kit_quantity && p.kit_quantity > 1 ? p.kit_quantity : null
+              const unitCost = kitQty ? p.cost_price / kitQty : p.cost_price
               return (
                 <tr key={p.id} className="hover:bg-secondary/30 transition-colors">
                   <td className="px-4 py-3 font-medium">{p.name}</td>
@@ -202,6 +205,10 @@ export function ProdutosTable({ products }: { products: Product[] }) {
                     {lowStock && <span className="text-destructive ml-1 text-xs">⚠</span>}
                   </td>
                   <td className="px-3 py-3 text-right text-muted-foreground">{usd(p.cost_price)}</td>
+                  <td className="px-3 py-3 text-right text-muted-foreground">
+                    {usd(unitCost)}
+                    {kitQty && <span className="text-[10px] ml-1 text-muted-foreground/60">(kit {kitQty})</span>}
+                  </td>
                   <td className="px-3 py-3 text-right font-medium">{usd(p.sale_price)}</td>
                   <td className="px-3 py-3 text-right text-brand-brown">{margin}%</td>
                   <td className="px-3 py-3 text-right text-amber-600 font-medium">{usd(salesTax)}</td>
@@ -214,7 +221,7 @@ export function ProdutosTable({ products }: { products: Product[] }) {
                   </td>
                   <td className="px-3 py-3">
                     <div className="flex flex-col gap-1 items-stretch">
-                      <Link href={`/produtos/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 text-xs px-2 justify-center')}>
+                      <Link href={`/estoque/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 text-xs px-2 justify-center')}>
                         Editar
                       </Link>
                       <ToggleActiveButton id={p.id} active={p.active} />

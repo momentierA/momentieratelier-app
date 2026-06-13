@@ -1,0 +1,1 @@
+ALTER TABLE products ADD COLUMN IF NOT EXISTS kit_quantity int DEFAULT 1;

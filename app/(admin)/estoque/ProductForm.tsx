@@ -41,6 +41,7 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
       category: defaultValues?.category ?? null,
       supplier: defaultValues?.supplier ?? null,
       supplier_link: defaultValues?.supplier_link ?? null,
+      kit_quantity: defaultValues?.kit_quantity ?? null,
     },
   })
 
@@ -78,7 +79,7 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
         alert(result.error)
         return
       }
-      router.push('/produtos')
+      router.push('/estoque')
     })
   }
 
@@ -92,8 +93,8 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
         {errors.name && <p className="text-destructive text-xs">{errors.name.message}</p>}
       </div>
 
-      {/* Linha 1: SKU · Estoque · Alerta */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Linha 1: SKU · Estoque · Alerta · Kit */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label>SKU *</Label>
           <Input {...register('sku')} placeholder="EX-001" className="font-mono" />
@@ -106,10 +107,15 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
           {errors.stock_quantity && <p className="text-destructive text-xs">{errors.stock_quantity.message}</p>}
         </div>
 
-        <div className="col-span-2 lg:col-span-1 space-y-2">
-          <Label>Alerta de estoque baixo</Label>
+        <div className="space-y-2">
+          <Label>Alerta estoque baixo</Label>
           <Input type="number" min={0} {...register('low_stock_threshold', { valueAsNumber: true })} />
-          <p className="text-xs text-muted-foreground">Avisa quando atingir este valor</p>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Qtd. no kit</Label>
+          <Input type="number" min={1} {...register('kit_quantity', { valueAsNumber: true, setValueAs: v => v === '' ? null : Number(v) })} placeholder="1" />
+          <p className="text-xs text-muted-foreground">Unidades por embalagem</p>
         </div>
       </div>
 
@@ -213,7 +219,7 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
         >
           {pending ? 'Salvando...' : productId ? 'Salvar alterações' : 'Criar produto'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.push('/produtos')}>
+        <Button type="button" variant="outline" onClick={() => router.push('/estoque')}>
           Cancelar
         </Button>
       </div>

@@ -12,6 +12,7 @@ export const ProductSchema = z.object({
   category: z.string().nullable().optional(),
   supplier: z.string().nullable().optional(),
   supplier_link: z.string().nullable().optional(),
+  kit_quantity: z.number().int().min(1).optional().nullable(),
 })
 
 export type ProductFormValues = z.infer<typeof ProductSchema>
