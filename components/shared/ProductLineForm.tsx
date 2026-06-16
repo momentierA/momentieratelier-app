@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { ProductLineSchema, type ProductLineFormValues } from '@/schemas/productLine'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ReceiptUpload } from '@/components/shared/ReceiptUpload'
@@ -66,7 +67,7 @@ export function ProductLineForm({ defaultValues, itemId, basePath, onSave, onUpd
 
       <div className="space-y-2">
         <Label>Descrição</Label>
-        <Input {...register('description')} placeholder="Descrição opcional" />
+        <Textarea {...register('description')} placeholder="Descrição do produto..." rows={3} className="resize-none" />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
