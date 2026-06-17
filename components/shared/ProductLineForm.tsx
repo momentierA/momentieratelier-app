@@ -45,6 +45,20 @@ export function ProductLineForm({ defaultValues, itemId, basePath, onSave, onUpd
   })
 
   const imageUrl = watch('image_url')
+  const costPrice = watch('cost_price') || 0
+  const salePrice = watch('sale_price') || 0
+
+  const SALES_TAX_RATE = 0.08
+  const INCOME_TAX_RATE = 0.30
+  const salesTax = salePrice * SALES_TAX_RATE
+  const grossProfit = salePrice - costPrice
+  const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
+  const netProfit = grossProfit - incomeTax
+  const margin = salePrice > 0 ? ((grossProfit / salePrice) * 100).toFixed(1) : null
+
+  function usd(v: number) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
+  }
 
   function onSubmit(values: ProductLineFormValues) {
     startTransition(async () => {
@@ -90,6 +104,38 @@ export function ProductLineForm({ defaultValues, itemId, basePath, onSave, onUpd
           <Input type="number" min={0} {...register('low_stock_threshold', { valueAsNumber: true })} />
         </div>
       </div>
+
+      {/* Calculadora em tempo real */}
+      {costPrice > 0 && salePrice > 0 && (
+        <div className="rounded-lg border border-border bg-secondary/40 p-4 space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Resumo financeiro</p>
+
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Margem</span>
+            <span className="font-medium text-brand-brown">{margin}%</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Lucro bruto</span>
+            <span>{usd(grossProfit)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Sales Tax (8% da venda)</span>
+            <span className="font-medium text-amber-700">– {usd(salesTax)}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Income Tax (30% do lucro bruto)</span>
+            <span className="font-medium text-amber-700">– {usd(incomeTax)}</span>
+          </div>
+          <div className="flex justify-between text-sm font-semibold border-t border-border pt-2">
+            <span>Lucro líquido</span>
+            <span className={netProfit >= 0 ? 'text-emerald-700' : 'text-destructive'}>{usd(netProfit)}</span>
+          </div>
+          <p className="text-[11px] text-muted-foreground pt-1">
+            Separar: <span className="font-medium text-amber-700">{usd(salesTax + incomeTax)}</span>
+            {' '}({usd(salesTax)} sales tax + {usd(incomeTax)} income tax)
+          </p>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label>Foto</Label>
