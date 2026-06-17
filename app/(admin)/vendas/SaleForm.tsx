@@ -111,58 +111,77 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
           </Button>
         </div>
 
-        {fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-[1fr_80px_100px_36px] gap-2 items-end">
-            <div className="space-y-1">
-              {index === 0 && <Label className="text-xs text-muted-foreground">Produto</Label>}
-              <Select onValueChange={(v) => onProductChange(index, v as string)}>
-                <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
-                <SelectContent>
-                  {estoqueProducts.length > 0 && (
-                    <SelectGroup>
-                      <SelectLabel className="text-xs text-muted-foreground">Estoque</SelectLabel>
-                      {estoqueProducts.map(p => (
-                        <SelectItem key={p.id} value={`e:${p.id}`}>
-                          {p.name} ({p.sku})
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  )}
-                  {momentierProducts.length > 0 && (
-                    <SelectGroup>
-                      <SelectLabel className="text-xs text-muted-foreground">Produtos Momentier</SelectLabel>
-                      {momentierProducts.map(p => (
-                        <SelectItem key={p.id} value={`m:${p.id}`}>
-                          {p.name}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  )}
-                </SelectContent>
-              </Select>
-              <input type="hidden" {...register(`items.${index}.product_ref`)} />
-              <input type="hidden" {...register(`items.${index}.product_name`)} />
+        {fields.map((field, index) => {
+          const qty = items[index]?.quantity || 0
+          const price = items[index]?.unit_price || 0
+          const subtotal = qty * price
+          return (
+            <div key={field.id} className="border border-border rounded-lg p-3 space-y-3 bg-secondary/20">
+              {/* Linha 1: produto + botão remover */}
+              <div className="flex items-end gap-2">
+                <div className="flex-1 space-y-1 min-w-0">
+                  <Label className="text-xs text-muted-foreground">Produto</Label>
+                  <Select onValueChange={(v) => onProductChange(index, v as string)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Selecionar produto..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {estoqueProducts.length > 0 && (
+                        <SelectGroup>
+                          <SelectLabel>Estoque</SelectLabel>
+                          {estoqueProducts.map(p => (
+                            <SelectItem key={p.id} value={`e:${p.id}`}>
+                              {p.name} <span className="text-muted-foreground">({p.sku})</span>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      )}
+                      {momentierProducts.length > 0 && (
+                        <SelectGroup>
+                          <SelectLabel>Produtos Momentier</SelectLabel>
+                          {momentierProducts.map(p => (
+                            <SelectItem key={p.id} value={`m:${p.id}`}>
+                              {p.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <input type="hidden" {...register(`items.${index}.product_ref`)} />
+                  <input type="hidden" {...register(`items.${index}.product_name`)} />
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => remove(index)}
+                  disabled={fields.length === 1}
+                  className="shrink-0 text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+
+              {/* Linha 2: qtd + preço + subtotal */}
+              <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-end">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Qtd</Label>
+                  <Input type="number" min={1} {...register(`items.${index}.quantity`, { valueAsNumber: true })} />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Preço unit. ($)</Label>
+                  <Input type="number" step="0.01" min={0} {...register(`items.${index}.unit_price`, { valueAsNumber: true })} />
+                </div>
+                {subtotal > 0 && (
+                  <div className="pb-2 text-sm font-semibold text-brand-brown whitespace-nowrap">
+                    = {usd(subtotal)}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="space-y-1">
-              {index === 0 && <Label className="text-xs text-muted-foreground">Qtd</Label>}
-              <Input type="number" min={1} {...register(`items.${index}.quantity`, { valueAsNumber: true })} />
-            </div>
-            <div className="space-y-1">
-              {index === 0 && <Label className="text-xs text-muted-foreground">Preço ($)</Label>}
-              <Input type="number" step="0.01" min={0} {...register(`items.${index}.unit_price`, { valueAsNumber: true })} />
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => remove(index)}
-              disabled={fields.length === 1}
-              className="text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        ))}
+          )
+        })}
         {errors.items && <p className="text-destructive text-xs">{errors.items.message ?? errors.items.root?.message}</p>}
 
         <div className="text-right text-sm font-semibold text-brand-red">
