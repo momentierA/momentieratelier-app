@@ -9,7 +9,7 @@ import { createSale } from '@/actions/sales'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectGroup, SelectLabel } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ReceiptUpload } from '@/components/shared/ReceiptUpload'
 import { Trash2, Plus } from 'lucide-react'
@@ -65,8 +65,13 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
   }
 
   const items = watch('items')
+  const paymentMethod = watch('payment_method')
   const total = items.reduce((acc, i) => acc + (i.quantity || 0) * (i.unit_price || 0), 0)
   const usd = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
+
+  const paymentLabels: Record<string, string> = {
+    dinheiro: 'Dinheiro', pix: 'PIX', cartão: 'Cartão', outro: 'Outro',
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -86,7 +91,9 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
         <div className="col-span-2 lg:col-span-1 space-y-2">
           <Label>Forma de pagamento *</Label>
           <Select defaultValue="outro" onValueChange={(v) => setValue('payment_method', v as SaleFormValues['payment_method'])}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <span className="text-sm">{paymentLabels[paymentMethod] ?? 'Outro'}</span>
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="dinheiro">Dinheiro</SelectItem>
               <SelectItem value="pix">PIX</SelectItem>
@@ -123,7 +130,9 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
                   <Label className="text-xs text-muted-foreground">Produto</Label>
                   <Select onValueChange={(v) => onProductChange(index, v as string)}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecionar produto..." />
+                      <span className={items[index]?.product_name ? 'truncate text-sm' : 'truncate text-sm text-muted-foreground'}>
+                        {items[index]?.product_name || 'Selecionar produto...'}
+                      </span>
                     </SelectTrigger>
                     <SelectContent>
                       {estoqueProducts.length > 0 && (
