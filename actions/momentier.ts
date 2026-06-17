@@ -7,6 +7,17 @@ import { ProductLineSchema, type ProductLineFormValues } from '@/schemas/product
 const TABLE = 'momentier_products'
 const PATH = '/entradas'
 
+export async function getMomentierActiveProducts() {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select('id, name, sale_price')
+    .eq('active', true)
+    .order('name')
+  if (error) throw error
+  return data ?? []
+}
+
 export async function getMomentierProducts() {
   const supabase = await createClient()
   const { data, error } = await supabase.from(TABLE).select('*').order('name')

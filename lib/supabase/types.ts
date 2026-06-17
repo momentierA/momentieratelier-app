@@ -43,6 +43,7 @@ export type Sale = {
   id: string
   sale_date: string
   payment_method: PaymentMethod
+  order_number: string | null
   notes: string | null
   receipt_url: string | null
   created_at: string
@@ -51,13 +52,15 @@ export type Sale = {
 export type SaleItem = {
   id: string
   sale_id: string
-  product_id: string
+  product_id: string | null
+  momentier_product_id: string | null
+  product_name: string | null
   quantity: number
   unit_price: number
 }
 
 export type SaleWithItems = Sale & {
-  sale_items: (SaleItem & { products: Pick<Product, 'name' | 'sku'> })[]
+  sale_items: SaleItem[]
 }
 
 export type Expense = {

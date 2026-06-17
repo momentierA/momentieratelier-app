@@ -9,7 +9,7 @@ export async function getSales() {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from('sales')
-    .select('*, sale_items(*, products(name, sku))')
+    .select('*, sale_items(id, product_id, momentier_product_id, product_name, quantity, unit_price)')
     .order('sale_date', { ascending: false })
   if (error) throw error
   return (data ?? []) as unknown as SaleWithItems[]
@@ -26,6 +26,7 @@ export async function createSale(values: SaleFormValues) {
     .insert({
       sale_date: parsed.data.sale_date,
       payment_method: parsed.data.payment_method,
+      order_number: parsed.data.order_number ?? null,
       notes: parsed.data.notes ?? null,
       receipt_url: parsed.data.receipt_url,
     })
@@ -34,17 +35,30 @@ export async function createSale(values: SaleFormValues) {
 
   if (saleError) return { error: saleError.message }
 
-  const { error: itemsError } = await supabase.from('sale_items').insert(
-    parsed.data.items.map((item) => ({ ...item, sale_id: sale.id }))
-  )
+  const saleItems = parsed.data.items.map((item) => {
+    const isEstoque = item.product_ref.startsWith('e:')
+    const uuid = item.product_ref.slice(2)
+    return {
+      sale_id: sale.id,
+      product_id: isEstoque ? uuid : null,
+      momentier_product_id: isEstoque ? null : uuid,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+    }
+  })
+
+  const { error: itemsError } = await supabase.from('sale_items').insert(saleItems)
   if (itemsError) return { error: itemsError.message }
 
-  // Decrementar estoque de cada produto
-  for (const item of parsed.data.items) {
-    await supabase.rpc('decrement_stock', {
-      p_product_id: item.product_id,
-      p_qty: item.quantity,
-    })
+  // Decrementa estoque apenas para produtos do Estoque
+  for (const item of saleItems) {
+    if (item.product_id) {
+      await supabase.rpc('decrement_stock', {
+        p_product_id: item.product_id,
+        p_qty: item.quantity,
+      })
+    }
   }
 
   revalidatePath('/vendas')

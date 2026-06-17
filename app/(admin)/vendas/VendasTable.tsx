@@ -28,6 +28,11 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return dir === 'asc' ? <ChevronUp size={12} className="shrink-0" /> : <ChevronDown size={12} className="shrink-0" />
 }
 
+function itemLabel(item: SaleWithItems['sale_items'][0]) {
+  const name = item.product_name ?? '—'
+  return `${name} ×${item.quantity}`
+}
+
 export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
   const [query, setQuery] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('all')
@@ -40,8 +45,9 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
     if (query.trim()) {
       const q = query.toLowerCase()
       r = r.filter(s =>
-        s.sale_items.some(i => i.products.name.toLowerCase().includes(q)) ||
-        (s.notes ?? '').toLowerCase().includes(q)
+        s.sale_items.some(i => (i.product_name ?? '').toLowerCase().includes(q)) ||
+        (s.notes ?? '').toLowerCase().includes(q) ||
+        (s.order_number ?? '').toLowerCase().includes(q)
       )
     }
     if (paymentFilter !== 'all') r = r.filter(s => s.payment_method === paymentFilter)
@@ -72,7 +78,7 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
         <div className="relative flex-1 min-w-[180px]">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
           <Input
-            placeholder="Buscar por produto ou nota..."
+            placeholder="Buscar por produto, pedido ou nota..."
             className="pl-8 h-8 text-sm"
             value={query}
             onChange={e => setQuery(e.target.value)}
@@ -101,7 +107,10 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
           return (
             <div key={s.id} className="px-4 py-3 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{fmtDate(s.sale_date)}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{fmtDate(s.sale_date)}</span>
+                  {s.order_number && <span className="text-xs font-mono text-brand-brown">{s.order_number}</span>}
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{paymentLabel[s.payment_method] ?? s.payment_method}</span>
                   <span className="font-bold text-sm">{usd(total)}</span>
@@ -109,7 +118,9 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
               </div>
               <div className="flex flex-wrap gap-1">
                 {s.sale_items.map(i => (
-                  <Badge key={i.id} variant="secondary" className="text-xs">{i.products.name} ×{i.quantity}</Badge>
+                  <Badge key={i.id} variant="secondary" className={cn('text-xs', i.momentier_product_id ? 'border-brand-red/30 text-brand-red' : '')}>
+                    {itemLabel(i)}
+                  </Badge>
                 ))}
               </div>
               {s.notes && <p className="text-xs text-muted-foreground truncate">{s.notes}</p>}
@@ -129,6 +140,7 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
               >
                 <span className="flex items-center gap-1">Data <SortIcon active={sortField === 'date'} dir={sortDir} /></span>
               </th>
+              <th className="px-4 py-3 text-left w-32 whitespace-nowrap">Nº Pedido</th>
               <th className="px-4 py-3 text-left">Produtos</th>
               <th
                 className="px-4 py-3 text-right w-28 whitespace-nowrap cursor-pointer select-none"
@@ -142,17 +154,24 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">Nenhuma venda encontrada.</td></tr>
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Nenhuma venda encontrada.</td></tr>
             )}
             {filtered.map((s) => {
               const total = s.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
               return (
                 <tr key={s.id} className="hover:bg-secondary/30 transition-colors">
                   <td className="px-4 py-3 whitespace-nowrap">{fmtDate(s.sale_date)}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-brand-brown">{s.order_number ?? '—'}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1">
                       {s.sale_items.map(i => (
-                        <Badge key={i.id} variant="secondary" className="text-xs">{i.products.name} ×{i.quantity}</Badge>
+                        <Badge
+                          key={i.id}
+                          variant="secondary"
+                          className={cn('text-xs', i.momentier_product_id ? 'border-brand-red/30 text-brand-red' : '')}
+                        >
+                          {itemLabel(i)}
+                        </Badge>
                       ))}
                     </div>
                   </td>
@@ -166,7 +185,7 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
           {filtered.length > 0 && (
             <tfoot>
               <tr className="border-t border-border bg-secondary/50">
-                <td colSpan={2} className="px-4 py-2 text-xs text-muted-foreground">Total filtrado</td>
+                <td colSpan={3} className="px-4 py-2 text-xs text-muted-foreground">Total filtrado</td>
                 <td className="px-4 py-2 text-right font-bold text-brand-red">{usd(filteredTotal)}</td>
                 <td colSpan={2} />
               </tr>

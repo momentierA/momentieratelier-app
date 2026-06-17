@@ -1,9 +1,13 @@
 import { ShoppingCart } from 'lucide-react'
 import { getActiveProducts } from '@/actions/products'
+import { getMomentierActiveProducts } from '@/actions/momentier'
 import { SaleForm } from '../SaleForm'
 
 export default async function NovaVendaPage() {
-  const products = await getActiveProducts()
+  const [estoqueProducts, momentierProducts] = await Promise.all([
+    getActiveProducts(),
+    getMomentierActiveProducts(),
+  ])
 
   return (
     <div className="space-y-5">
@@ -18,7 +22,7 @@ export default async function NovaVendaPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border p-5">
-        <SaleForm products={products} />
+        <SaleForm estoqueProducts={estoqueProducts} momentierProducts={momentierProducts} />
       </div>
     </div>
   )
