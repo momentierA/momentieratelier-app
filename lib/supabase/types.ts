@@ -149,6 +149,12 @@ export type Database = {
         Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
         Relationships: []
       }
+      momentier_products: {
+        Row: ProductLineItem
+        Insert: Omit<ProductLineItem, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {

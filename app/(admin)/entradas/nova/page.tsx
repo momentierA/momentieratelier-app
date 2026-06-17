@@ -1,10 +1,8 @@
 import { PackageOpen } from 'lucide-react'
-import { getActiveProducts } from '@/actions/products'
-import { PurchaseForm } from '../PurchaseForm'
+import { ProductLineForm } from '@/components/shared/ProductLineForm'
+import { createMomentierProduct, updateMomentierProduct } from '@/actions/momentier'
 
-export default async function NovaEntradaPage() {
-  const products = await getActiveProducts()
-
+export default function NovoProdutoMomentierPage() {
   return (
     <div className="space-y-5">
       <div className="rounded-2xl bg-brand-red p-5 text-white flex items-center gap-4">
@@ -12,13 +10,13 @@ export default async function NovaEntradaPage() {
           <PackageOpen size={22} />
         </div>
         <div>
-          <p className="text-xs text-white/60 uppercase tracking-wider">Entradas</p>
-          <h1 className="text-xl font-bold">Nova entrada de estoque</h1>
+          <p className="text-xs text-white/60 uppercase tracking-wider">Produtos Momentier</p>
+          <h1 className="text-xl font-bold">Novo produto</h1>
         </div>
       </div>
 
       <div className="bg-white rounded-xl border border-border p-5">
-        <PurchaseForm products={products} />
+        <ProductLineForm basePath="/entradas" onSave={createMomentierProduct} onUpdate={updateMomentierProduct} />
       </div>
     </div>
   )
