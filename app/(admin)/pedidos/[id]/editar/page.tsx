@@ -47,6 +47,17 @@ export default async function EditarPedidoPage({ params }: { params: Promise<{ i
             payment2_date: order.payment2_date,
             payment2_method: order.payment2_method as ProductionOrderFormValues['payment2_method'],
             notes: order.notes,
+            items: order.production_order_items.map(i => ({
+              quantity: i.quantity,
+              product_name: i.product_name,
+              product_color: i.product_color,
+              personalization: i.personalization,
+              personalization_color: i.personalization_color as ProductionOrderFormValues['items'][0]['personalization_color'],
+              custom_name: i.custom_name,
+              font: i.font as ProductionOrderFormValues['items'][0]['font'],
+              design: i.design as ProductionOrderFormValues['items'][0]['design'],
+              unit_price: i.unit_price,
+            })),
           }}
           onSave={handleUpdate}
         />

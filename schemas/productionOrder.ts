@@ -2,6 +2,18 @@ import { z } from 'zod'
 
 const PaymentMethod = z.enum(['dinheiro', 'pix', 'cartão', 'outro']).nullable()
 
+export const OrderItemSchema = z.object({
+  quantity: z.number().int().min(1, 'Qtd mínima: 1'),
+  product_name: z.string().min(1, 'Nome do produto obrigatório'),
+  product_color: z.string().nullable(),
+  personalization: z.boolean(),
+  personalization_color: z.enum(['dourado_matte', 'dourado_metalico', 'pink', 'branco', 'azul_matte', 'preto']).nullable(),
+  custom_name: z.string().nullable(),
+  font: z.enum(['A', 'B', 'C', 'D']).nullable(),
+  design: z.enum(['01', '02', '03', '04']).nullable(),
+  unit_price: z.number().min(0),
+})
+
 export const ProductionOrderSchema = z.object({
   customer_name: z.string().min(1, 'Nome obrigatório'),
   customer_phone: z.string().nullable(),
@@ -20,6 +32,8 @@ export const ProductionOrderSchema = z.object({
   payment2_date: z.string().nullable(),
   payment2_method: PaymentMethod,
   notes: z.string().nullable(),
+  items: z.array(OrderItemSchema),
 })
 
+export type OrderItemFormValues = z.infer<typeof OrderItemSchema>
 export type ProductionOrderFormValues = z.infer<typeof ProductionOrderSchema>

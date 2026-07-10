@@ -4,7 +4,8 @@ import { useState, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
+import Link from 'next/link'
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SaleWithItems } from '@/lib/supabase/types'
 
@@ -114,6 +115,9 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{paymentLabel[s.payment_method] ?? s.payment_method}</span>
                   <span className="font-bold text-sm">{usd(total)}</span>
+                  <Link href={`/vendas/${s.id}/editar`} className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground">
+                    <Pencil size={13} />
+                  </Link>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1">
@@ -150,11 +154,12 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
               </th>
               <th className="px-4 py-3 text-left w-32 whitespace-nowrap">Pagamento</th>
               <th className="px-4 py-3 text-left whitespace-nowrap">Notas</th>
+              <th className="px-4 py-3 w-10" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Nenhuma venda encontrada.</td></tr>
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Nenhuma venda encontrada.</td></tr>
             )}
             {filtered.map((s) => {
               const total = s.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
@@ -178,6 +183,11 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
                   <td className="px-4 py-3 text-right font-semibold">{usd(total)}</td>
                   <td className="px-4 py-3">{paymentLabel[s.payment_method] ?? s.payment_method}</td>
                   <td className="px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate">{s.notes ?? '—'}</td>
+                  <td className="px-4 py-3">
+                    <Link href={`/vendas/${s.id}/editar`} className="p-1.5 rounded-md hover:bg-secondary transition-colors text-muted-foreground inline-flex">
+                      <Pencil size={14} />
+                    </Link>
+                  </td>
                 </tr>
               )
             })}

@@ -1,6 +1,7 @@
 import { ShoppingCart } from 'lucide-react'
 import { getActiveProducts } from '@/actions/products'
 import { getMomentierActiveProducts } from '@/actions/momentier'
+import { createSale } from '@/actions/sales'
 import { SaleForm } from '../SaleForm'
 
 export default async function NovaVendaPage() {
@@ -22,7 +23,7 @@ export default async function NovaVendaPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border p-5">
-        <SaleForm estoqueProducts={estoqueProducts} momentierProducts={momentierProducts} />
+        <SaleForm estoqueProducts={estoqueProducts} momentierProducts={momentierProducts} onSave={createSale} />
       </div>
     </div>
   )

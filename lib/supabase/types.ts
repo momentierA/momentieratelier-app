@@ -96,6 +96,25 @@ export type ProductionOrder = {
   created_at: string
 }
 
+export type ProductionOrderItem = {
+  id: string
+  order_id: string
+  quantity: number
+  product_name: string
+  product_color: string | null
+  personalization: boolean
+  personalization_color: string | null
+  custom_name: string | null
+  font: string | null
+  design: string | null
+  unit_price: number
+  created_at: string
+}
+
+export type ProductionOrderWithItems = ProductionOrder & {
+  production_order_items: ProductionOrderItem[]
+}
+
 export type ProductLineItem = {
   id: string
   name: string
@@ -184,6 +203,12 @@ export type Database = {
         Row: ProductionOrder
         Insert: Omit<ProductionOrder, 'id' | 'created_at'>
         Update: Partial<Omit<ProductionOrder, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      production_order_items: {
+        Row: ProductionOrderItem
+        Insert: Omit<ProductionOrderItem, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductionOrderItem, 'id' | 'created_at'>>
         Relationships: []
       }
     }

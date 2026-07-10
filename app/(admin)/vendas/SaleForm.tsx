@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { SaleSchema, type SaleFormValues } from '@/schemas/sale'
-import { createSale } from '@/actions/sales'
+
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -17,9 +17,12 @@ import { Trash2, Plus } from 'lucide-react'
 interface Props {
   estoqueProducts: { id: string; name: string; sku: string; sale_price: number; stock_quantity?: number }[]
   momentierProducts: { id: string; name: string; sale_price: number }[]
+  defaultValues?: Partial<SaleFormValues>
+  saleId?: string
+  onSave: (values: SaleFormValues) => Promise<{ error?: string; success?: boolean }>
 }
 
-export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
+export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, saleId, onSave }: Props) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const today = new Date().toISOString().split('T')[0]
@@ -33,6 +36,7 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
       notes: '',
       receipt_url: null,
       items: [{ product_ref: '', product_name: '', quantity: 1, unit_price: 0 }],
+      ...defaultValues,
     },
   })
 
@@ -58,7 +62,7 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
 
   function onSubmit(values: SaleFormValues) {
     startTransition(async () => {
-      const result = await createSale(values)
+      const result = await onSave(values)
       if (result.error) { alert(result.error); return }
       router.push('/vendas')
     })
@@ -210,7 +214,7 @@ export function SaleForm({ estoqueProducts, momentierProducts }: Props) {
 
       <div className="flex gap-3">
         <Button type="submit" disabled={pending} className="bg-brand-red hover:bg-brand-red-dark text-white">
-          {pending ? 'Salvando...' : 'Registrar venda'}
+          {pending ? 'Salvando...' : saleId ? 'Salvar alterações' : 'Registrar venda'}
         </Button>
         <Button type="button" variant="outline" onClick={() => router.push('/vendas')}>Cancelar</Button>
       </div>
