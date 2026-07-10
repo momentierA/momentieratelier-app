@@ -74,6 +74,28 @@ export type Expense = {
   created_at: string
 }
 
+export type ProductionOrder = {
+  id: string
+  customer_name: string
+  customer_phone: string | null
+  customer_email: string | null
+  customer_birthday: string | null
+  order_number: string | null
+  order_date: string
+  delivery_date: string | null
+  delivery_type: string
+  order_source: string | null
+  total_amount: number
+  payment1_amount: number | null
+  payment1_date: string | null
+  payment1_method: string | null
+  payment2_amount: number | null
+  payment2_date: string | null
+  payment2_method: string | null
+  notes: string | null
+  created_at: string
+}
+
 export type ProductLineItem = {
   id: string
   name: string
@@ -156,6 +178,12 @@ export type Database = {
         Row: ProductLineItem
         Insert: Omit<ProductLineItem, 'id' | 'created_at'>
         Update: Partial<Omit<ProductLineItem, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      production_orders: {
+        Row: ProductionOrder
+        Insert: Omit<ProductionOrder, 'id' | 'created_at'>
+        Update: Partial<Omit<ProductionOrder, 'id' | 'created_at'>>
         Relationships: []
       }
     }

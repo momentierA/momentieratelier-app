@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Archive, DollarSign, MoreHorizontal,
-  ShoppingCart, PackageOpen, BarChart2, X, Package
+  ShoppingCart, PackageOpen, BarChart2, X, Package, ClipboardList
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -19,6 +19,7 @@ const moreNav = [
   { href: '/vendas', icon: ShoppingCart, label: 'Vendas' },
   { href: '/produtos', icon: Package, label: 'Produtos' },
   { href: '/entradas', icon: PackageOpen, label: 'Prod. Momentier' },
+  { href: '/pedidos', icon: ClipboardList, label: 'Pedidos' },
   { href: '/relatorios', icon: BarChart2, label: 'Relatórios' },
 ]
 

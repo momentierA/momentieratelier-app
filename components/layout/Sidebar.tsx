@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, Package, ShoppingCart, PackageOpen,
-  DollarSign, BarChart2, LogOut, Archive,
+  DollarSign, BarChart2, LogOut, Archive, ClipboardList,
   Notebook, Sparkles, Gift, Flower2, ChevronDown, ChevronUp
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -26,6 +26,7 @@ const produtosSubNav = [
 
 const navBottom = [
   { href: '/entradas', label: 'Produtos Momentier', icon: PackageOpen },
+  { href: '/pedidos', label: 'Pedidos em produção', icon: ClipboardList },
   { href: '/financeiro', label: 'Financeiro', icon: DollarSign },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart2 },
 ]
