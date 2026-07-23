@@ -1,13 +1,21 @@
 import { ShoppingCart } from 'lucide-react'
 import { getActiveProducts } from '@/actions/products'
 import { getMomentierActiveProducts } from '@/actions/momentier'
+import { getActivePapelaria } from '@/actions/papelaria'
+import { getActivePersonalizados } from '@/actions/personalizados'
+import { getActiveCestas } from '@/actions/cestas'
+import { getActiveBBW } from '@/actions/bbw'
 import { createSale } from '@/actions/sales'
 import { SaleForm } from '../SaleForm'
 
 export default async function NovaVendaPage() {
-  const [estoqueProducts, momentierProducts] = await Promise.all([
+  const [estoqueProducts, momentierProducts, papelariaProducts, personalizadosProducts, cestasProducts, bbwProducts] = await Promise.all([
     getActiveProducts(),
     getMomentierActiveProducts(),
+    getActivePapelaria(),
+    getActivePersonalizados(),
+    getActiveCestas(),
+    getActiveBBW(),
   ])
 
   return (
@@ -23,7 +31,15 @@ export default async function NovaVendaPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-border p-5">
-        <SaleForm estoqueProducts={estoqueProducts} momentierProducts={momentierProducts} onSave={createSale} />
+        <SaleForm
+          estoqueProducts={estoqueProducts}
+          momentierProducts={momentierProducts}
+          papelariaProducts={papelariaProducts}
+          personalizadosProducts={personalizadosProducts}
+          cestasProducts={cestasProducts}
+          bbwProducts={bbwProducts}
+          onSave={createSale}
+        />
       </div>
     </div>
   )

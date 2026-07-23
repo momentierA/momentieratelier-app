@@ -1,12 +1,19 @@
 import Link from 'next/link'
 import { getBBW, toggleBBWActive } from '@/actions/bbw'
+import { copyProductLineItemToMomentier } from '@/actions/momentier'
 import { buttonVariants } from '@/components/ui/button'
 import { Plus, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProductLineTable } from '@/components/shared/ProductLineTable'
+import type { ProductLineItem } from '@/lib/supabase/types'
 
 export default async function BBWPage() {
   const items = await getBBW()
+
+  async function handleCopy(item: ProductLineItem) {
+    'use server'
+    return copyProductLineItemToMomentier(item)
+  }
 
   return (
     <div className="space-y-6">
@@ -22,7 +29,7 @@ export default async function BBWPage() {
         </Link>
       </div>
 
-      <ProductLineTable items={items} basePath="/produtos/bbw" toggleActive={toggleBBWActive} />
+      <ProductLineTable items={items} basePath="/produtos/bbw" toggleActive={toggleBBWActive} onCopyToMomentier={handleCopy} />
     </div>
   )
 }

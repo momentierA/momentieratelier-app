@@ -1,12 +1,19 @@
 import Link from 'next/link'
 import { getPersonalizados, togglePersonalizadosActive } from '@/actions/personalizados'
+import { copyProductLineItemToMomentier } from '@/actions/momentier'
 import { buttonVariants } from '@/components/ui/button'
 import { Plus, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProductLineTable } from '@/components/shared/ProductLineTable'
+import type { ProductLineItem } from '@/lib/supabase/types'
 
 export default async function PersonalizadosPage() {
   const items = await getPersonalizados()
+
+  async function handleCopy(item: ProductLineItem) {
+    'use server'
+    return copyProductLineItemToMomentier(item)
+  }
 
   return (
     <div className="space-y-6">
@@ -22,7 +29,7 @@ export default async function PersonalizadosPage() {
         </Link>
       </div>
 
-      <ProductLineTable items={items} basePath="/produtos/personalizados" toggleActive={togglePersonalizadosActive} />
+      <ProductLineTable items={items} basePath="/produtos/personalizados" toggleActive={togglePersonalizadosActive} onCopyToMomentier={handleCopy} />
     </div>
   )
 }

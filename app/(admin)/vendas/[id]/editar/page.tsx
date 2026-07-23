@@ -3,20 +3,28 @@ import { ShoppingCart } from 'lucide-react'
 import { getSaleById, updateSale } from '@/actions/sales'
 import { getActiveProducts } from '@/actions/products'
 import { getMomentierActiveProducts } from '@/actions/momentier'
+import { getActivePapelaria } from '@/actions/papelaria'
+import { getActivePersonalizados } from '@/actions/personalizados'
+import { getActiveCestas } from '@/actions/cestas'
+import { getActiveBBW } from '@/actions/bbw'
 import { SaleForm } from '../../SaleForm'
 import type { SaleFormValues } from '@/schemas/sale'
 
 export default async function EditarVendaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const [sale, estoqueProducts, momentierProducts] = await Promise.all([
+  const [sale, estoqueProducts, momentierProducts, papelariaProducts, personalizadosProducts, cestasProducts, bbwProducts] = await Promise.all([
     getSaleById(id).catch(() => null),
     getActiveProducts(),
     getMomentierActiveProducts(),
+    getActivePapelaria(),
+    getActivePersonalizados(),
+    getActiveCestas(),
+    getActiveBBW(),
   ])
   if (!sale) notFound()
 
   const defaultItems = sale.sale_items.map(item => ({
-    product_ref: item.product_id ? `e:${item.product_id}` : `m:${item.momentier_product_id}`,
+    product_ref: item.product_id ? `e:${item.product_id}` : item.momentier_product_id ? `m:${item.momentier_product_id}` : '',
     product_name: item.product_name ?? '',
     quantity: item.quantity,
     unit_price: item.unit_price,
@@ -43,6 +51,10 @@ export default async function EditarVendaPage({ params }: { params: Promise<{ id
         <SaleForm
           estoqueProducts={estoqueProducts}
           momentierProducts={momentierProducts}
+          papelariaProducts={papelariaProducts}
+          personalizadosProducts={personalizadosProducts}
+          cestasProducts={cestasProducts}
+          bbwProducts={bbwProducts}
           saleId={id}
           defaultValues={{
             sale_date: sale.sale_date,

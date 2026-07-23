@@ -48,3 +48,10 @@ export async function toggleBBWActive(id: string, active: boolean) {
   revalidatePath(PATH)
   return { success: true }
 }
+
+export async function getActiveBBW() {
+  const supabase = await createClient()
+  const { data, error } = await supabase.from(TABLE).select('id, name, sale_price').eq('active', true).order('name')
+  if (error) throw error
+  return data ?? []
+}

@@ -52,6 +52,17 @@ export async function updateMomentierProduct(id: string, values: ProductLineForm
   return { success: true }
 }
 
+export async function copyProductLineItemToMomentier(item: {
+  name: string; description: string | null; cost_price: number; sale_price: number;
+  stock_quantity: number; low_stock_threshold: number; image_url: string | null; active: boolean
+}) {
+  const supabase = await createClient()
+  const { error } = await supabase.from(TABLE).insert(item)
+  if (error) return { error: error.message }
+  revalidatePath(PATH)
+  return { success: true }
+}
+
 export async function toggleMomentierProductActive(id: string, active: boolean) {
   const supabase = await createClient()
   const { error } = await supabase.from(TABLE).update({ active }).eq('id', id)

@@ -14,15 +14,25 @@ import { Textarea } from '@/components/ui/textarea'
 import { ReceiptUpload } from '@/components/shared/ReceiptUpload'
 import { Trash2, Plus } from 'lucide-react'
 
+type SimpleProduct = { id: string; name: string; sale_price: number }
+
 interface Props {
   estoqueProducts: { id: string; name: string; sku: string; sale_price: number; stock_quantity?: number }[]
-  momentierProducts: { id: string; name: string; sale_price: number }[]
+  momentierProducts: SimpleProduct[]
+  papelariaProducts: SimpleProduct[]
+  personalizadosProducts: SimpleProduct[]
+  cestasProducts: SimpleProduct[]
+  bbwProducts: SimpleProduct[]
   defaultValues?: Partial<SaleFormValues>
   saleId?: string
   onSave: (values: SaleFormValues) => Promise<{ error?: string; success?: boolean }>
 }
 
-export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, saleId, onSave }: Props) {
+export function SaleForm({
+  estoqueProducts, momentierProducts,
+  papelariaProducts, personalizadosProducts, cestasProducts, bbwProducts,
+  defaultValues, saleId, onSave,
+}: Props) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const today = new Date().toISOString().split('T')[0]
@@ -44,19 +54,33 @@ export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, sa
 
   function onProductChange(index: number, ref: string) {
     setValue(`items.${index}.product_ref`, ref)
+    const id = ref.substring(ref.indexOf(':') + 1)
+    let name = ''
+    let price = 0
 
     if (ref.startsWith('e:')) {
-      const product = estoqueProducts.find(p => p.id === ref.slice(2))
-      if (product) {
-        setValue(`items.${index}.product_name`, product.name)
-        setValue(`items.${index}.unit_price`, product.sale_price)
-      }
+      const p = estoqueProducts.find(p => p.id === id)
+      if (p) { name = p.name; price = p.sale_price }
     } else if (ref.startsWith('m:')) {
-      const product = momentierProducts.find(p => p.id === ref.slice(2))
-      if (product) {
-        setValue(`items.${index}.product_name`, product.name)
-        setValue(`items.${index}.unit_price`, product.sale_price)
-      }
+      const p = momentierProducts.find(p => p.id === id)
+      if (p) { name = p.name; price = p.sale_price }
+    } else if (ref.startsWith('pa:')) {
+      const p = papelariaProducts.find(p => p.id === id)
+      if (p) { name = p.name; price = p.sale_price }
+    } else if (ref.startsWith('pe:')) {
+      const p = personalizadosProducts.find(p => p.id === id)
+      if (p) { name = p.name; price = p.sale_price }
+    } else if (ref.startsWith('ce:')) {
+      const p = cestasProducts.find(p => p.id === id)
+      if (p) { name = p.name; price = p.sale_price }
+    } else if (ref.startsWith('bb:')) {
+      const p = bbwProducts.find(p => p.id === id)
+      if (p) { name = p.name; price = p.sale_price }
+    }
+
+    if (name) {
+      setValue(`items.${index}.product_name`, name)
+      setValue(`items.${index}.unit_price`, price)
     }
   }
 
@@ -77,6 +101,18 @@ export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, sa
     dinheiro: 'Dinheiro', pix: 'PIX', cartão: 'Cartão', outro: 'Outro',
   }
 
+  function ProductGroup({ prefix, label, products }: { prefix: string; label: string; products: SimpleProduct[] }) {
+    if (!products.length) return null
+    return (
+      <SelectGroup>
+        <SelectLabel>{label}</SelectLabel>
+        {products.map(p => (
+          <SelectItem key={p.id} value={`${prefix}${p.id}`}>{p.name}</SelectItem>
+        ))}
+      </SelectGroup>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Data · Nº pedido · Pagamento */}
@@ -94,7 +130,7 @@ export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, sa
 
         <div className="col-span-2 lg:col-span-1 space-y-2">
           <Label>Forma de pagamento *</Label>
-          <Select defaultValue="outro" onValueChange={(v) => setValue('payment_method', v as SaleFormValues['payment_method'])}>
+          <Select defaultValue={defaultValues?.payment_method ?? 'outro'} onValueChange={(v) => setValue('payment_method', v as SaleFormValues['payment_method'])}>
             <SelectTrigger>
               <span className="text-sm">{paymentLabels[paymentMethod] ?? 'Outro'}</span>
             </SelectTrigger>
@@ -128,7 +164,6 @@ export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, sa
           const subtotal = qty * price
           return (
             <div key={field.id} className="border border-border rounded-lg p-3 space-y-3 bg-secondary/20">
-              {/* Linha 1: produto + botão remover */}
               <div className="flex items-end gap-2">
                 <div className="flex-1 space-y-1 min-w-0">
                   <Label className="text-xs text-muted-foreground">Produto</Label>
@@ -149,16 +184,11 @@ export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, sa
                           ))}
                         </SelectGroup>
                       )}
-                      {momentierProducts.length > 0 && (
-                        <SelectGroup>
-                          <SelectLabel>Produtos Momentier</SelectLabel>
-                          {momentierProducts.map(p => (
-                            <SelectItem key={p.id} value={`m:${p.id}`}>
-                              {p.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      )}
+                      <ProductGroup prefix="m:" label="Produtos Momentier" products={momentierProducts} />
+                      <ProductGroup prefix="pa:" label="Papelaria" products={papelariaProducts} />
+                      <ProductGroup prefix="pe:" label="Personalizados" products={personalizadosProducts} />
+                      <ProductGroup prefix="ce:" label="Cestas" products={cestasProducts} />
+                      <ProductGroup prefix="bb:" label="BBW" products={bbwProducts} />
                     </SelectContent>
                   </Select>
                   <input type="hidden" {...register(`items.${index}.product_ref`)} />
@@ -176,7 +206,6 @@ export function SaleForm({ estoqueProducts, momentierProducts, defaultValues, sa
                 </Button>
               </div>
 
-              {/* Linha 2: qtd + preço + subtotal */}
               <div className="grid grid-cols-[100px_1fr_auto] gap-3 items-end">
                 <div className="space-y-1">
                   <Label className="text-xs text-muted-foreground">Qtd</Label>

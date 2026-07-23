@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { buttonVariants } from '@/components/ui/button'
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil } from 'lucide-react'
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil, ArrowUpRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ProductLineItem } from '@/lib/supabase/types'
 
@@ -28,13 +28,15 @@ interface Props {
   items: ProductLineItem[]
   basePath: string
   toggleActive: (id: string, active: boolean) => Promise<{ error?: string }>
+  onCopyToMomentier?: (item: ProductLineItem) => Promise<{ error?: string; success?: boolean }>
 }
 
-export function ProductLineTable({ items, basePath, toggleActive }: Props) {
+export function ProductLineTable({ items, basePath, toggleActive, onCopyToMomentier }: Props) {
   const [query, setQuery] = useState('')
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [pending, startTransition] = useTransition()
+  const [copyingId, setCopyingId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     let r = items
@@ -81,6 +83,17 @@ export function ProductLineTable({ items, basePath, toggleActive }: Props) {
     startTransition(async () => {
       const result = await toggleActive(id, !active)
       if (result.error) alert(result.error)
+    })
+  }
+
+  function handleCopy(item: ProductLineItem) {
+    if (!onCopyToMomentier) return
+    setCopyingId(item.id)
+    startTransition(async () => {
+      const result = await onCopyToMomentier(item)
+      setCopyingId(null)
+      if (result?.error) alert(result.error)
+      else alert(`"${item.name}" copiado para Produtos Momentier!`)
     })
   }
 
@@ -134,6 +147,16 @@ export function ProductLineTable({ items, basePath, toggleActive }: Props) {
                   <Link href={`${basePath}/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 px-2')}>
                     <Pencil size={12} />
                   </Link>
+                  {onCopyToMomentier && (
+                    <button
+                      onClick={() => handleCopy(p)}
+                      disabled={pending || copyingId === p.id}
+                      title="Copiar para Produtos Momentier"
+                      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 px-2 text-xs text-brand-brown border-brand-brown/40 hover:bg-brand-cream')}
+                    >
+                      <ArrowUpRight size={12} />
+                    </button>
+                  )}
                   <button
                     onClick={() => handleToggle(p.id, p.active)}
                     disabled={pending}
@@ -201,6 +224,17 @@ export function ProductLineTable({ items, basePath, toggleActive }: Props) {
                       <Link href={`${basePath}/${p.id}/editar`} className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 text-xs px-2 justify-center')}>
                         Editar
                       </Link>
+                      {onCopyToMomentier && (
+                        <button
+                          onClick={() => handleCopy(p)}
+                          disabled={pending || copyingId === p.id}
+                          title="Copiar para Produtos Momentier"
+                          className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'h-7 text-xs px-2 text-brand-brown border-brand-brown/40 hover:bg-brand-cream')}
+                        >
+                          <ArrowUpRight size={12} className="mr-1" />
+                          {copyingId === p.id ? '...' : 'Momentier'}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleToggle(p.id, p.active)}
                         disabled={pending}

@@ -1,13 +1,20 @@
 import Link from 'next/link'
 import { getPapelaria } from '@/actions/papelaria'
 import { togglePapelariaActive } from '@/actions/papelaria'
+import { copyProductLineItemToMomentier } from '@/actions/momentier'
 import { buttonVariants } from '@/components/ui/button'
 import { Plus, ChevronLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ProductLineTable } from '@/components/shared/ProductLineTable'
+import type { ProductLineItem } from '@/lib/supabase/types'
 
 export default async function PapelariaPage() {
   const items = await getPapelaria()
+
+  async function handleCopy(item: ProductLineItem) {
+    'use server'
+    return copyProductLineItemToMomentier(item)
+  }
 
   return (
     <div className="space-y-6">
@@ -23,7 +30,7 @@ export default async function PapelariaPage() {
         </Link>
       </div>
 
-      <ProductLineTable items={items} basePath="/produtos/papelaria" toggleActive={togglePapelariaActive} />
+      <ProductLineTable items={items} basePath="/produtos/papelaria" toggleActive={togglePapelariaActive} onCopyToMomentier={handleCopy} />
     </div>
   )
 }

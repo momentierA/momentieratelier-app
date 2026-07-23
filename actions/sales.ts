@@ -37,11 +37,12 @@ export async function createSale(values: SaleFormValues) {
 
   const saleItems = parsed.data.items.map((item) => {
     const isEstoque = item.product_ref.startsWith('e:')
-    const uuid = item.product_ref.slice(2)
+    const isMomentier = item.product_ref.startsWith('m:')
+    const uuid = item.product_ref.substring(item.product_ref.indexOf(':') + 1)
     return {
       sale_id: sale.id,
       product_id: isEstoque ? uuid : null,
-      momentier_product_id: isEstoque ? null : uuid,
+      momentier_product_id: isMomentier ? uuid : null,
       product_name: item.product_name,
       quantity: item.quantity,
       unit_price: item.unit_price,
@@ -100,11 +101,12 @@ export async function updateSale(id: string, values: SaleFormValues) {
 
   const saleItems = parsed.data.items.map((item) => {
     const isEstoque = item.product_ref.startsWith('e:')
-    const uuid = item.product_ref.slice(2)
+    const isMomentier = item.product_ref.startsWith('m:')
+    const uuid = item.product_ref.substring(item.product_ref.indexOf(':') + 1)
     return {
       sale_id: id,
       product_id: isEstoque ? uuid : null,
-      momentier_product_id: isEstoque ? null : uuid,
+      momentier_product_id: isMomentier ? uuid : null,
       product_name: item.product_name,
       quantity: item.quantity,
       unit_price: item.unit_price,
