@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getSales } from '@/actions/sales'
+import { getSales, deleteSale } from '@/actions/sales'
 import { buttonVariants } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -17,7 +17,7 @@ export default async function VendasPage() {
         </Link>
       </div>
 
-      <VendasTable sales={sales} />
+      <VendasTable sales={sales} onDelete={deleteSale} />
     </div>
   )
 }

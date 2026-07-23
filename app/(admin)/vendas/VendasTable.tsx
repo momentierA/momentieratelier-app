@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useTransition } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Link from 'next/link'
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil } from 'lucide-react'
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SaleWithItems } from '@/lib/supabase/types'
 
@@ -34,11 +34,28 @@ function itemLabel(item: SaleWithItems['sale_items'][0]) {
   return `${name} ×${item.quantity}`
 }
 
-export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
+interface Props {
+  sales: SaleWithItems[]
+  onDelete: (id: string) => Promise<{ error?: string; success?: boolean }>
+}
+
+export function VendasTable({ sales, onDelete }: Props) {
   const [query, setQuery] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('all')
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [, startTransition] = useTransition()
+
+  function handleDelete(id: string, label: string) {
+    if (!confirm(`Apagar a venda "${label}"? Esta ação não pode ser desfeita.`)) return
+    setDeletingId(id)
+    startTransition(async () => {
+      const result = await onDelete(id)
+      setDeletingId(null)
+      if (result?.error) alert(result.error)
+    })
+  }
 
   const filtered = useMemo(() => {
     let r = sales
@@ -118,6 +135,13 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
                   <Link href={`/vendas/${s.id}/editar`} className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground">
                     <Pencil size={13} />
                   </Link>
+                  <button
+                    onClick={() => handleDelete(s.id, s.order_number ?? fmtDate(s.sale_date))}
+                    disabled={deletingId === s.id}
+                    className="p-1 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
               <div className="flex flex-wrap gap-1">
@@ -184,9 +208,18 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
                   <td className="px-4 py-3">{paymentLabel[s.payment_method] ?? s.payment_method}</td>
                   <td className="px-4 py-3 text-muted-foreground text-xs max-w-[200px] truncate">{s.notes ?? '—'}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/vendas/${s.id}/editar`} className="p-1.5 rounded-md hover:bg-secondary transition-colors text-muted-foreground inline-flex">
-                      <Pencil size={14} />
-                    </Link>
+                    <div className="flex items-center gap-1">
+                      <Link href={`/vendas/${s.id}/editar`} className="p-1.5 rounded-md hover:bg-secondary transition-colors text-muted-foreground inline-flex">
+                        <Pencil size={14} />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(s.id, s.order_number ?? fmtDate(s.sale_date))}
+                        disabled={deletingId === s.id}
+                        className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive inline-flex disabled:opacity-40"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               )
@@ -197,7 +230,7 @@ export function VendasTable({ sales }: { sales: SaleWithItems[] }) {
               <tr className="border-t border-border bg-secondary/50">
                 <td colSpan={3} className="px-4 py-2 text-xs text-muted-foreground">Total filtrado</td>
                 <td className="px-4 py-2 text-right font-bold text-brand-red">{usd(filteredTotal)}</td>
-                <td colSpan={2} />
+                <td colSpan={3} />
               </tr>
             </tfoot>
           )}
