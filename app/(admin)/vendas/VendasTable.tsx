@@ -21,7 +21,7 @@ const paymentLabel: Record<string, string> = {
   dinheiro: 'Dinheiro', pix: 'PIX', cartão: 'Cartão', outro: 'Outro',
 }
 
-type SortField = 'date' | 'total'
+type SortField = 'order_number' | 'date' | 'total'
 type SortDir = 'asc' | 'desc'
 
 function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
@@ -42,7 +42,7 @@ interface Props {
 export function VendasTable({ sales, onDelete }: Props) {
   const [query, setQuery] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('all')
-  const [sortField, setSortField] = useState<SortField>('date')
+  const [sortField, setSortField] = useState<SortField>('order_number')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
@@ -71,6 +71,15 @@ export function VendasTable({ sales, onDelete }: Props) {
     if (paymentFilter !== 'all') r = r.filter(s => s.payment_method === paymentFilter)
 
     return [...r].sort((a, b) => {
+      if (sortField === 'order_number') {
+        const oa = a.order_number ?? ''
+        const ob = b.order_number ?? ''
+        if (!oa && !ob) return 0
+        if (!oa) return 1
+        if (!ob) return -1
+        const cmp = oa.localeCompare(ob, undefined, { numeric: true, sensitivity: 'base' })
+        return sortDir === 'asc' ? cmp : -cmp
+      }
       const totalA = a.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
       const totalB = b.sale_items.reduce((acc, i) => acc + i.quantity * i.unit_price, 0)
       const va = sortField === 'date' ? a.sale_date : totalA
@@ -168,7 +177,12 @@ export function VendasTable({ sales, onDelete }: Props) {
               >
                 <span className="flex items-center gap-1">Data <SortIcon active={sortField === 'date'} dir={sortDir} /></span>
               </th>
-              <th className="px-4 py-3 text-left w-32 whitespace-nowrap">Nº Pedido</th>
+              <th
+                className="px-4 py-3 text-left w-32 whitespace-nowrap cursor-pointer select-none"
+                onClick={() => toggleSort('order_number')}
+              >
+                <span className="flex items-center gap-1">Nº Pedido <SortIcon active={sortField === 'order_number'} dir={sortDir} /></span>
+              </th>
               <th className="px-4 py-3 text-left">Produtos</th>
               <th
                 className="px-4 py-3 text-right w-28 whitespace-nowrap cursor-pointer select-none"
