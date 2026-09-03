@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getProducts } from '@/actions/products'
+import { getProducts, deleteProduct } from '@/actions/products'
 import { buttonVariants } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -17,7 +17,7 @@ export default async function EstoquePage() {
         </Link>
       </div>
 
-      <ProdutosTable products={products} />
+      <ProdutosTable products={products} onDelete={deleteProduct} />
     </div>
   )
 }

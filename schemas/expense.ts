@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const ExpenseSchema = z.object({
   description: z.string().min(1, 'Descrição obrigatória'),
   amount: z.number().min(0.01, 'Valor deve ser maior que zero'),
-  category: z.enum(['shipping', 'taxas', 'operacional', 'insumos', 'outros']),
+  category: z.enum(['shipping', 'taxas', 'operacional', 'insumos', 'tools', 'outros']),
   expense_date: z.string().min(1, 'Data obrigatória'),
   supplier: z.string().nullable().optional(),
   receipt_url: z.string().nullable(),

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useTransition } from 'react'
+import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown, FileText } from 'lucide-react'
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown, FileText, Pencil, Trash2 } from 'lucide-react'
 import type { Expense } from '@/lib/supabase/types'
 
 function usd(v: number) {
@@ -15,7 +16,7 @@ function fmtDate(d: string) {
 }
 
 const categoryLabel: Record<string, string> = {
-  insumos: 'Insumos', shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', outros: 'Outros',
+  insumos: 'Insumos', shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', tools: 'Tools', outros: 'Outros',
 }
 
 const categoryColor: Record<string, string> = {
@@ -23,6 +24,7 @@ const categoryColor: Record<string, string> = {
   shipping: 'bg-blue-100 text-blue-800',
   taxas: 'bg-amber-100 text-amber-800',
   operacional: 'bg-purple-100 text-purple-800',
+  tools: 'bg-cyan-100 text-cyan-800',
   outros: 'bg-gray-100 text-gray-800',
 }
 
@@ -34,11 +36,28 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return dir === 'asc' ? <ChevronUp size={12} className="shrink-0" /> : <ChevronDown size={12} className="shrink-0" />
 }
 
-export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
+interface Props {
+  expenses: Expense[]
+  onDelete: (id: string) => Promise<{ error?: string; success?: boolean }>
+}
+
+export function FinanceiroTable({ expenses, onDelete }: Props) {
   const [query, setQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [, startTransition] = useTransition()
+
+  function handleDelete(id: string, label: string) {
+    if (!confirm(`Apagar a despesa "${label}"? Esta ação não pode ser desfeita.`)) return
+    setDeletingId(id)
+    startTransition(async () => {
+      const result = await onDelete(id)
+      setDeletingId(null)
+      if (result?.error) alert(result.error)
+    })
+  }
 
   const filtered = useMemo(() => {
     let r = expenses
@@ -89,6 +108,7 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
             <SelectItem value="shipping">Shipping</SelectItem>
             <SelectItem value="taxas">Taxas</SelectItem>
             <SelectItem value="operacional">Operacional</SelectItem>
+            <SelectItem value="tools">Tools</SelectItem>
             <SelectItem value="outros">Outros</SelectItem>
           </SelectContent>
         </Select>
@@ -119,6 +139,16 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
                   <FileText size={14} />
                 </a>
               )}
+              <Link href={`/financeiro/${e.id}/editar`} className="p-1 rounded hover:bg-secondary transition-colors text-muted-foreground">
+                <Pencil size={13} />
+              </Link>
+              <button
+                onClick={() => handleDelete(e.id, e.description)}
+                disabled={deletingId === e.id}
+                className="p-1 rounded hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive disabled:opacity-40"
+              >
+                <Trash2 size={13} />
+              </button>
             </div>
           </div>
         ))}
@@ -145,11 +175,12 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
                 <span className="flex items-center justify-end gap-1">Valor <SortIcon active={sortField === 'amount'} dir={sortDir} /></span>
               </th>
               <th className="px-4 py-3 text-center w-16 whitespace-nowrap">Recibo</th>
+              <th className="px-4 py-3 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">Nenhuma despesa encontrada.</td></tr>
+              <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">Nenhuma despesa encontrada.</td></tr>
             )}
             {filtered.map((e) => (
               <tr key={e.id} className="hover:bg-secondary/30 transition-colors">
@@ -168,6 +199,20 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
                     : '—'
                   }
                 </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    <Link href={`/financeiro/${e.id}/editar`} className="p-1.5 rounded-md hover:bg-secondary transition-colors text-muted-foreground inline-flex">
+                      <Pencil size={14} />
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(e.id, e.description)}
+                      disabled={deletingId === e.id}
+                      className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive inline-flex disabled:opacity-40"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -176,7 +221,7 @@ export function FinanceiroTable({ expenses }: { expenses: Expense[] }) {
               <tr className="border-t border-border bg-secondary/50">
                 <td colSpan={4} className="px-4 py-2 text-xs text-muted-foreground">Total filtrado</td>
                 <td className="px-4 py-2 text-right font-bold text-brand-red">{usd(filteredTotal)}</td>
-                <td />
+                <td colSpan={2} />
               </tr>
             </tfoot>
           )}

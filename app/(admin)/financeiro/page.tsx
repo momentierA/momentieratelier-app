@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getExpenses } from '@/actions/expenses'
+import { getExpenses, deleteExpense } from '@/actions/expenses'
 import { buttonVariants } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -10,7 +10,7 @@ function usd(v: number) {
 }
 
 const categoryLabel: Record<string, string> = {
-  insumos: 'Insumos', shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', outros: 'Outros',
+  insumos: 'Insumos', shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', tools: 'Tools', outros: 'Outros',
 }
 
 export default async function FinanceiroPage() {
@@ -48,7 +48,7 @@ export default async function FinanceiroPage() {
         <span className="font-semibold text-brand-red">{usd(monthTotal)}</span>
       </div>
 
-      <FinanceiroTable expenses={expenses} />
+      <FinanceiroTable expenses={expenses} onDelete={deleteExpense} />
     </div>
   )
 }

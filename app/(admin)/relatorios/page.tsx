@@ -60,7 +60,7 @@ export default async function RelatoriosPage() {
   }
 
   const categoryLabel: Record<string, string> = {
-    shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', outros: 'Outros',
+    shipping: 'Shipping', taxas: 'Taxas', operacional: 'Operacional', tools: 'Tools', outros: 'Outros',
   }
 
   return (

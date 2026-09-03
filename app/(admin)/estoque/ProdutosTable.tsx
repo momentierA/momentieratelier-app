@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useTransition } from 'react'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { buttonVariants } from '@/components/ui/button'
 import { ToggleActiveButton } from './ToggleActiveButton'
-import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil } from 'lucide-react'
+import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getUnitCost } from '@/lib/productCost'
 import type { Product } from '@/lib/supabase/types'
@@ -27,12 +27,29 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return dir === 'asc' ? <ChevronUp size={12} className="shrink-0" /> : <ChevronDown size={12} className="shrink-0" />
 }
 
-export function ProdutosTable({ products }: { products: Product[] }) {
+interface Props {
+  products: Product[]
+  onDelete: (id: string) => Promise<{ error?: string; success?: boolean }>
+}
+
+export function ProdutosTable({ products, onDelete }: Props) {
   const [query, setQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [, startTransition] = useTransition()
+
+  function handleDelete(id: string, name: string) {
+    if (!confirm(`Apagar o produto "${name}"? Esta ação não pode ser desfeita.`)) return
+    setDeletingId(id)
+    startTransition(async () => {
+      const result = await onDelete(id)
+      setDeletingId(null)
+      if (result?.error) alert(result.error)
+    })
+  }
 
   const categories = useMemo(
     () => Array.from(new Set(products.map(p => p.category).filter(Boolean) as string[])).sort(),
@@ -159,6 +176,13 @@ export function ProdutosTable({ products }: { products: Product[] }) {
                     <Pencil size={12} />
                   </Link>
                   <ToggleActiveButton id={p.id} active={p.active} />
+                  <button
+                    onClick={() => handleDelete(p.id, p.name)}
+                    disabled={deletingId === p.id}
+                    className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive disabled:opacity-40"
+                  >
+                    <Trash2 size={13} />
+                  </button>
                 </div>
               </div>
             </div>
@@ -231,6 +255,13 @@ export function ProdutosTable({ products }: { products: Product[] }) {
                         Editar
                       </Link>
                       <ToggleActiveButton id={p.id} active={p.active} />
+                      <button
+                        onClick={() => handleDelete(p.id, p.name)}
+                        disabled={deletingId === p.id}
+                        className="h-7 text-xs px-2 rounded-md border border-transparent hover:border-destructive/30 hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive disabled:opacity-40 inline-flex items-center justify-center gap-1"
+                      >
+                        <Trash2 size={12} /> Apagar
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -67,3 +67,16 @@ export async function toggleProductActive(id: string, active: boolean) {
   revalidatePath('/estoque')
   return { success: true }
 }
+
+export async function deleteProduct(id: string) {
+  const supabase = await createClient()
+  const { error } = await supabase.from('products').delete().eq('id', id)
+  if (error) {
+    if (error.code === '23503') {
+      return { error: 'Não é possível apagar: este produto já tem vendas ou entradas registradas. Use "Inativar" para escondê-lo sem perder o histórico.' }
+    }
+    return { error: error.message }
+  }
+  revalidatePath('/estoque')
+  return { success: true }
+}

@@ -14,6 +14,17 @@ export async function getExpenses() {
   return data ?? []
 }
 
+export async function getExpenseById(id: string) {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('expenses')
+    .select('*')
+    .eq('id', id)
+    .single()
+  if (error) throw error
+  return data
+}
+
 export async function createExpense(values: ExpenseFormValues) {
   const parsed = ExpenseSchema.safeParse(values)
   if (!parsed.success) return { error: parsed.error.issues[0].message }
