@@ -64,7 +64,7 @@ Stack: Next.js 16 · Tailwind v4 · shadcn/ui · Supabase · Vercel · Zod · Re
 
 ## Versão atual
 
-`v1.0.0` — 2026-05-30 — estrutura inicial completa
+`v1.17.0` — 2026-09-03 — Estoque: cálculos de margem/lucro usam custo unitário para produtos em kit
 
 ---
 

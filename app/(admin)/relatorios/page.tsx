@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { getUnitCost } from '@/lib/productCost'
 
 function usd(v: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v)
@@ -12,7 +13,7 @@ export default async function RelatoriosPage() {
   const [salesRes, expensesRes, productsRes, purchasesRes] = await Promise.all([
     supabase.from('sales').select('sale_date, sale_items(quantity, unit_price, product_id, products(name))'),
     supabase.from('expenses').select('amount, category, expense_date'),
-    supabase.from('products').select('id, name, sku, stock_quantity, cost_price, sale_price, active').eq('active', true).order('name'),
+    supabase.from('products').select('id, name, sku, stock_quantity, cost_price, sale_price, active, kit_quantity').eq('active', true).order('name'),
     supabase.from('purchases').select('purchase_date, purchase_items(quantity, unit_cost, product_id)'),
   ])
 
@@ -92,7 +93,7 @@ export default async function RelatoriosPage() {
                 )}
                 {topProducts.map((p) => {
                   const product = products.find(pr => pr.name === p.name)
-                  const cost = product ? p.qty * product.cost_price : 0
+                  const cost = product ? p.qty * getUnitCost(product.cost_price, product.kit_quantity) : 0
                   const profit = p.revenue - cost
                   return (
                     <tr key={p.name} className="hover:bg-secondary/30">
@@ -185,7 +186,7 @@ export default async function RelatoriosPage() {
                     <td className="px-4 py-3 font-medium">{p.name}</td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{p.sku}</td>
                     <td className="px-4 py-3 text-right">{p.stock_quantity}</td>
-                    <td className="px-4 py-3 text-right">{usd(p.stock_quantity * p.cost_price)}</td>
+                    <td className="px-4 py-3 text-right">{usd(p.stock_quantity * getUnitCost(p.cost_price, p.kit_quantity))}</td>
                     <td className="px-4 py-3 text-center">
                       <Badge variant={p.stock_quantity === 0 ? 'destructive' : p.stock_quantity <= 5 ? 'outline' : 'default'}
                         className={p.stock_quantity > 5 ? 'bg-brand-red' : ''}>

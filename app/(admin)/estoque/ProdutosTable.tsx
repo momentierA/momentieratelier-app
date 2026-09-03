@@ -9,6 +9,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { ToggleActiveButton } from './ToggleActiveButton'
 import { Search, ChevronUp, ChevronDown, ChevronsUpDown, Pencil } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { getUnitCost } from '@/lib/productCost'
 import type { Product } from '@/lib/supabase/types'
 
 function usd(v: number) {
@@ -54,11 +55,15 @@ export function ProdutosTable({ products }: { products: Product[] }) {
       else if (sortField === 'stock') { va = a.stock_quantity; vb = b.stock_quantity }
       else if (sortField === 'sale_price') { va = a.sale_price; vb = b.sale_price }
       else if (sortField === 'margin') {
-        va = a.sale_price > 0 ? (a.sale_price - a.cost_price) / a.sale_price : 0
-        vb = b.sale_price > 0 ? (b.sale_price - b.cost_price) / b.sale_price : 0
+        const aCost = getUnitCost(a.cost_price, a.kit_quantity)
+        const bCost = getUnitCost(b.cost_price, b.kit_quantity)
+        va = a.sale_price > 0 ? (a.sale_price - aCost) / a.sale_price : 0
+        vb = b.sale_price > 0 ? (b.sale_price - bCost) / b.sale_price : 0
       } else {
-        va = Math.max(0, (a.sale_price - a.cost_price) * (1 - INCOME_TAX_RATE))
-        vb = Math.max(0, (b.sale_price - b.cost_price) * (1 - INCOME_TAX_RATE))
+        const aCost = getUnitCost(a.cost_price, a.kit_quantity)
+        const bCost = getUnitCost(b.cost_price, b.kit_quantity)
+        va = Math.max(0, (a.sale_price - aCost) * (1 - INCOME_TAX_RATE))
+        vb = Math.max(0, (b.sale_price - bCost) * (1 - INCOME_TAX_RATE))
       }
       if (va < vb) return sortDir === 'asc' ? -1 : 1
       if (va > vb) return sortDir === 'asc' ? 1 : -1
@@ -120,10 +125,11 @@ export function ProdutosTable({ products }: { products: Product[] }) {
           <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum produto encontrado.</p>
         )}
         {filtered.map((p) => {
-          const margin = p.sale_price > 0 ? ((p.sale_price - p.cost_price) / p.sale_price * 100).toFixed(1) : '0.0'
+          const unitCost = getUnitCost(p.cost_price, p.kit_quantity)
+          const margin = p.sale_price > 0 ? ((p.sale_price - unitCost) / p.sale_price * 100).toFixed(1) : '0.0'
           const lowStock = p.stock_quantity <= p.low_stock_threshold
           const salesTax = p.sale_price * SALES_TAX_RATE
-          const grossProfit = p.sale_price - p.cost_price
+          const grossProfit = p.sale_price - unitCost
           const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
           const netProfit = grossProfit - incomeTax
           return (
@@ -186,14 +192,14 @@ export function ProdutosTable({ products }: { products: Product[] }) {
               <tr><td colSpan={14} className="px-4 py-8 text-center text-muted-foreground">Nenhum produto encontrado.</td></tr>
             )}
             {filtered.map((p) => {
-              const margin = p.sale_price > 0 ? ((p.sale_price - p.cost_price) / p.sale_price * 100).toFixed(1) : '0.0'
+              const kitQty = p.kit_quantity && p.kit_quantity > 1 ? p.kit_quantity : null
+              const unitCost = getUnitCost(p.cost_price, p.kit_quantity)
+              const margin = p.sale_price > 0 ? ((p.sale_price - unitCost) / p.sale_price * 100).toFixed(1) : '0.0'
               const lowStock = p.stock_quantity <= p.low_stock_threshold
               const salesTax = p.sale_price * SALES_TAX_RATE
-              const grossProfit = p.sale_price - p.cost_price
+              const grossProfit = p.sale_price - unitCost
               const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
               const netProfit = grossProfit - incomeTax
-              const kitQty = p.kit_quantity && p.kit_quantity > 1 ? p.kit_quantity : null
-              const unitCost = kitQty ? p.cost_price / kitQty : p.cost_price
               return (
                 <tr key={p.id} className="hover:bg-secondary/30 transition-colors">
                   <td className="px-4 py-3 font-medium">{p.name}</td>

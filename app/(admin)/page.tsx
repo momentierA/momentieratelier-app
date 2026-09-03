@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { MetricCard } from '@/components/dashboard/MetricCard'
 import { Badge } from '@/components/ui/badge'
+import { getUnitCost } from '@/lib/productCost'
 import { TrendingUp, TrendingDown, DollarSign, Package, AlertTriangle } from 'lucide-react'
 
 function usd(value: number) {
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
       .gte('expense_date', startOfMonth),
     supabase
       .from('products')
-      .select('id, name, sku, stock_quantity, low_stock_threshold, sale_price, cost_price')
+      .select('id, name, sku, stock_quantity, low_stock_threshold, sale_price, cost_price, kit_quantity')
       .eq('active', true),
   ])
 
@@ -43,7 +44,7 @@ export default async function DashboardPage() {
   const costOfSales = salesData.reduce((acc, sale) => {
     return acc + sale.sale_items.reduce((s, i) => {
       const product = products.find(p => p.id === i.product_id)
-      return s + i.quantity * (product?.cost_price ?? 0)
+      return s + i.quantity * (product ? getUnitCost(product.cost_price, product.kit_quantity) : 0)
     }, 0)
   }, 0)
 

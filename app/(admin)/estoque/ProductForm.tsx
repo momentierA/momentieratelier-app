@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { ReceiptUpload } from '@/components/shared/ReceiptUpload'
+import { getUnitCost } from '@/lib/productCost'
 import type { Product } from '@/lib/supabase/types'
 
 interface ProductFormProps {
@@ -48,20 +49,24 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
   const imageUrl = watch('image_url')
   const costPrice = watch('cost_price') || 0
   const salePrice = watch('sale_price') || 0
+  const kitQuantity = watch('kit_quantity')
 
   const MARKUP_MIN = 3
   const MARKUP_MAX = 4.5
   const SALES_TAX_RATE = 0.08
   const INCOME_TAX_RATE = 0.30
 
-  const suggestedMin = costPrice * MARKUP_MIN
-  const suggestedMax = costPrice * MARKUP_MAX
+  const isKit = !!kitQuantity && kitQuantity > 1
+  const unitCost = getUnitCost(costPrice, kitQuantity)
+
+  const suggestedMin = unitCost * MARKUP_MIN
+  const suggestedMax = unitCost * MARKUP_MAX
   const salesTax = salePrice * SALES_TAX_RATE
-  const grossProfit = salePrice - costPrice
+  const grossProfit = salePrice - unitCost
   const incomeTax = Math.max(0, grossProfit * INCOME_TAX_RATE)
   const netProfit = grossProfit - incomeTax
 
-  const priceStatus = costPrice > 0 && salePrice > 0
+  const priceStatus = unitCost > 0 && salePrice > 0
     ? salePrice < suggestedMin ? 'below' : salePrice > suggestedMax ? 'above' : 'within'
     : null
 
@@ -143,6 +148,13 @@ export function ProductForm({ defaultValues, productId }: ProductFormProps) {
       {costPrice > 0 && (
         <div className="rounded-lg border border-border bg-secondary/40 p-4 space-y-3">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Calculadora de Preço</p>
+
+          {isKit && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">Custo unitário (kit de {kitQuantity})</span>
+              <span className="font-semibold text-sm">{usd(unitCost)}</span>
+            </div>
+          )}
 
           {/* Faixa sugerida */}
           <div className="flex items-center justify-between">
